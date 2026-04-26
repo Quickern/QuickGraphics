@@ -22,6 +22,6 @@ public static class StaticCanvas
     }
 
     public static void Line(Color color, Point first, Point second) => s_canvas.Line(color, first, second);
-    public static void Rectangle(Color color, Vector topLeft, Vector bottomRight) { }
-    public static void Circle(Color color, Vector center, int radius) { }
+    public static void Rectangle(Color color, Point topLeft, Size size) => s_canvas.Rectangle(color, topLeft, size);
+    public static void Circle(Color color, Point center, int radius) => s_canvas.Circle(color, center, radius);
 }

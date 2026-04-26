@@ -82,10 +82,24 @@ public class Canvas
         _toDraw.Enqueue(line);
     }
 
+    public void Circle(Color color, Point center, int radius)
+    {
+        Circle circle = new Circle { Color = color };
+        circle.Initialize(center, radius);
+
+        _toDraw.Enqueue(circle);
+    }
+
+    public void Rectangle(Color color, Point topLeft, Size size)
+    {
+        Rectangle rect = new Rectangle { Color = color };
+        rect.Initialize(topLeft, size);
+
+        _toDraw.Enqueue(rect);
+    }
+
     private void OnLoad()
     {
-        Console.WriteLine("OnLoad");
-
         _gl = _window.CreateOpenGL();
 
         OpenGLRenderer nvgRenderer = new(CreateFlags.StencilStrokes | CreateFlags.Debug, _gl);

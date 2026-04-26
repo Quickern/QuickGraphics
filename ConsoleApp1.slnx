@@ -19,5 +19,5 @@
     <Project Path="QuickGraphics/QuickGraphics.csproj" />
   </Folder>
   <!-- <Project Path="ClassLibrary1/ClassLibrary1.csproj" /> -->
-  <Project Path="ConsoleApp1/ConsoleApp1.csproj" />
+  <Project Path="Simple/Simple.csproj" />
 </Solution>
