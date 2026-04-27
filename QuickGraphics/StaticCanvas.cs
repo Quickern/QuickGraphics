@@ -16,7 +16,7 @@ public static class StaticCanvas
     public static Task ForFrame => s_canvas.WaitFrame;
     public static Task ForExit => s_canvas.RunTask;
 
-    public static async Task ForCanvas(int width, int height)
+    public static Starter ForCanvas(int width, int height)
     {
         s_canvas = new Canvas(new Size(width, height));
 
@@ -40,7 +40,24 @@ public static class StaticCanvas
         });
         mainThread.Start();
 
-        await tcs.Task;
+        return new Starter(tcs.Task);
+    }
+
+    public readonly struct Starter(Task task) : INotifyCompletion
+    {
+        public bool IsCompleted { get; }
+
+        readonly Task _task = task;
+        public void OnCompleted(Action _Continuation)
+        {
+            _task.ContinueWith((_, _) => _Continuation(), TaskContinuationOptions.ExecuteSynchronously);
+
+            s_canvas.Run();
+        }
+
+        public void GetResult() { }
+
+        public Starter GetAwaiter() => this;
     }
 
     public static void ClearCanvas() => s_canvas.ClearCanvas();
