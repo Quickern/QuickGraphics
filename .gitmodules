@@ -1,0 +1,3 @@
+[submodule "Nvg.NET"]
+	path = Nvg.NET
+	url = git@github.com:zvasya/Nvg.NET.git

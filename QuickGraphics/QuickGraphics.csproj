@@ -14,7 +14,7 @@
 	</ItemGroup>
 
   <ItemGroup>
-      <ProjectReference Include="../../../Pipopolam/Nvg.NET/src/rendering/Nvg.Rendering.OpenGL/Nvg.Rendering.OpenGL.csproj" />
+      <ProjectReference Include="../Nvg.NET/src/rendering/Nvg.Rendering.OpenGL/Nvg.Rendering.OpenGL.csproj" />
   </ItemGroup>
 
 </Project>
