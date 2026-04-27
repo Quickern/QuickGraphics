@@ -26,7 +26,7 @@ public static class StaticCanvas
         {
             Thread.CurrentThread.Name = "UI Thread";
 
-            SingleThreadSynchronizationContext context = new SingleThreadSynchronizationContext(() => { });
+            SingleThreadSynchronizationContext context = new SingleThreadSynchronizationContext();
             SynchronizationContext.SetSynchronizationContext(context);
 
             tcs.TrySetResult();

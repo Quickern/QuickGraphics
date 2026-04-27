@@ -17,41 +17,15 @@ public class Canvas
     private Nvg _nvg;
     public Nvg Nvg => _nvg;
 
-    private SingleThreadSynchronizationContext _syncContext;
     private readonly Queue<Primitive> _toDraw = new Queue<Primitive>();
 
-    private bool _isRunning;
     private readonly TaskCompletionSource _tcs = new TaskCompletionSource();
 
     public bool IsClosed { get; private set; }
-    public Task RunTask
-    {
-        get
-        {
-            async Task FirstRun()
-            {
-                await Task.Yield();
-                await _tcs.Task;
-            }
-
-            return _isRunning ? _tcs.Task : FirstRun();
-        }
-    }
+    public Task RunTask => _tcs.Task;
 
     private TaskCompletionSource _frameTcs = new TaskCompletionSource();
-    public Task WaitFrame
-    {
-        get
-        {
-            async Task FirstRun()
-            {
-                await Task.Yield();
-                await _frameTcs.Task;
-            }
-
-            return _isRunning ? _frameTcs.Task : FirstRun();
-        }
-    }
+    public Task WaitFrame => _frameTcs.Task;
 
     public Size Size => new Size(_window.Size.X, _window.Size.Y);
 
@@ -146,7 +120,14 @@ public class Canvas
     private void OnClose()
     {
         IsClosed = true;
+
+        TaskCompletionSource frameTcs = _frameTcs;        
+        _frameTcs = new TaskCompletionSource();
+        frameTcs.TrySetResult();
+
         _tcs.TrySetResult();
+
+        FrameEvent.Set();
 
         _nvg.Dispose();
         _gl.Dispose();

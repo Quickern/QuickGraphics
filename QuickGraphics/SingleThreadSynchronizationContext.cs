@@ -1,16 +1,13 @@
-using System;
 using System.Collections.Concurrent;
 
 namespace QuickGraphics;
 
-public class SingleThreadSynchronizationContext(Action init) : SynchronizationContext
+public class SingleThreadSynchronizationContext : SynchronizationContext
 {
     readonly ConcurrentQueue<(SendOrPostCallback D, object? State)> m_Queue = new();
     readonly Thread m_MainThread = Thread.CurrentThread;
 
     public bool IsMainThread => m_MainThread == Thread.CurrentThread;
-
-    private Action? _init = init;
 
     public override void Send(SendOrPostCallback _D, object? _State)
     {
@@ -43,13 +40,6 @@ public class SingleThreadSynchronizationContext(Action init) : SynchronizationCo
         ArgumentNullException.ThrowIfNull(_D);
 
         m_Queue.Enqueue((_D, _State));
-
-        if (_init != null && IsMainThread)
-        {
-            Action init = _init;
-            _init = null;
-            init();
-        }
     }
 
     public void Invoke()
