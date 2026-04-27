@@ -20,4 +20,5 @@
   </Folder>
   <!-- <Project Path="ClassLibrary1/ClassLibrary1.csproj" /> -->
   <Project Path="Simple/Simple.csproj" />
+  <Project Path="Animation/Animation.csproj" />
 </Solution>

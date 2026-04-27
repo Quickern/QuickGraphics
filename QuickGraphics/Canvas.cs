@@ -21,7 +21,7 @@ public class Canvas
     private readonly Queue<Primitive> _toDraw = new Queue<Primitive>();
 
     private bool _isRunning;
-    private readonly TaskCompletionSource m_Tcs = new TaskCompletionSource();
+    private readonly TaskCompletionSource _tcs = new TaskCompletionSource();
 
     public bool IsClosed { get; private set; }
     public Task RunTask
@@ -34,11 +34,12 @@ public class Canvas
                 _window.Run();
             }
             
-            return m_Tcs.Task;
+            return _tcs.Task;
         }
     }
 
-    public YieldAwaitable WaitFrame
+    private TaskCompletionSource _frameTcs = new TaskCompletionSource();
+    public Task WaitFrame
     {
         get
         {
@@ -48,7 +49,7 @@ public class Canvas
                 _window.Run();
             }
 
-            return Task.Yield();
+            return _frameTcs.Task;
         }
     }
 
@@ -72,6 +73,11 @@ public class Canvas
         _window.Load += OnLoad;
         _window.Render += OnRender;
         _window.Closing += OnClose;
+    }
+
+    public void ClearCanvas()
+    {
+        _toDraw.Clear();
     }
 
     public void Line(Color color, Point first, Point second)
@@ -119,6 +125,10 @@ public class Canvas
 
         _nvg.BeginFrame(winSize, pxRatio);
         
+        TaskCompletionSource frameTcs = _frameTcs;        
+        _frameTcs = new TaskCompletionSource();
+        frameTcs.TrySetResult();
+
         _syncContext.Invoke();
 
         foreach (Primitive primitive in _toDraw)
@@ -132,7 +142,7 @@ public class Canvas
     private void OnClose()
     {
         IsClosed = true;
-        m_Tcs.TrySetResult();
+        _tcs.TrySetResult();
 
         _nvg.Dispose();
         _gl.Dispose();

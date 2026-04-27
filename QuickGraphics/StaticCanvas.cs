@@ -13,7 +13,7 @@ public static class StaticCanvas
     public static int CanvasWidth => CanvasSize.Width;
     public static int CanvasHeight => CanvasSize.Height;
 
-    public static YieldAwaitable ForFrame => s_canvas.WaitFrame;
+    public static Task ForFrame => s_canvas.WaitFrame;
     public static Task ForExit => s_canvas.RunTask;
 
     public static void Canvas(int width, int height)
@@ -21,6 +21,7 @@ public static class StaticCanvas
         s_canvas = new Canvas(new Size(width, height));
     }
 
+    public static void ClearCanvas() => s_canvas.ClearCanvas();
     public static void Line(Color color, Point first, Point second) => s_canvas.Line(color, first, second);
     public static void Rectangle(Color color, Point topLeft, Size size) => s_canvas.Rectangle(color, topLeft, size);
     public static void Circle(Color color, Point center, int radius) => s_canvas.Circle(color, center, radius);
