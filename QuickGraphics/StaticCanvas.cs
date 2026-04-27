@@ -16,9 +16,31 @@ public static class StaticCanvas
     public static Task ForFrame => s_canvas.WaitFrame;
     public static Task ForExit => s_canvas.RunTask;
 
-    public static void Canvas(int width, int height)
+    public static async Task ForCanvas(int width, int height)
     {
         s_canvas = new Canvas(new Size(width, height));
+
+        TaskCompletionSource tcs = new TaskCompletionSource();
+        
+        Thread mainThread = new Thread(() =>
+        {
+            Thread.CurrentThread.Name = "UI Thread";
+
+            SingleThreadSynchronizationContext context = new SingleThreadSynchronizationContext(() => { });
+            SynchronizationContext.SetSynchronizationContext(context);
+
+            tcs.TrySetResult();
+
+            while (!s_canvas.IsClosed)
+            {
+                s_canvas.FrameEvent.WaitOne();
+
+                context.Invoke();
+            }
+        });
+        mainThread.Start();
+
+        await tcs.Task;
     }
 
     public static void ClearCanvas() => s_canvas.ClearCanvas();

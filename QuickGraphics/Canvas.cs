@@ -28,13 +28,13 @@ public class Canvas
     {
         get
         {
-            if (!_isRunning)
+            async Task FirstRun()
             {
-                _isRunning = true;
-                _window.Run();
+                await Task.Yield();
+                await _tcs.Task;
             }
-            
-            return _tcs.Task;
+
+            return _isRunning ? _tcs.Task : FirstRun();
         }
     }
 
@@ -43,25 +43,24 @@ public class Canvas
     {
         get
         {
-            if (!_isRunning)
+            async Task FirstRun()
             {
-                _isRunning = true;
-                _window.Run();
+                await Task.Yield();
+                await _frameTcs.Task;
             }
 
-            return _frameTcs.Task;
+            return _isRunning ? _frameTcs.Task : FirstRun();
         }
     }
 
     public Size Size => new Size(_window.Size.X, _window.Size.Y);
 
+    public AutoResetEvent FrameEvent { get; } = new AutoResetEvent(false);
+
     public Canvas(Size size)
     {
-        _syncContext = new SingleThreadSynchronizationContext();
-        SynchronizationContext.SetSynchronizationContext(_syncContext);
-
         WindowOptions windowOptions = WindowOptions.Default;
-        windowOptions.FramesPerSecond = -1;
+        windowOptions.FramesPerSecond = 60;
         windowOptions.ShouldSwapAutomatically = true;
         windowOptions.Size = new Vector2D<int>(size.Width, size.Height);
         windowOptions.Title = Assembly.GetEntryAssembly()?.GetName().Name ?? "Canvas";
@@ -73,6 +72,11 @@ public class Canvas
         _window.Load += OnLoad;
         _window.Render += OnRender;
         _window.Closing += OnClose;
+    }
+
+    public void Run()
+    {
+        _window.Run();
     }
 
     public void ClearCanvas()
@@ -124,12 +128,12 @@ public class Canvas
         _gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
 
         _nvg.BeginFrame(winSize, pxRatio);
-        
+
         TaskCompletionSource frameTcs = _frameTcs;        
         _frameTcs = new TaskCompletionSource();
         frameTcs.TrySetResult();
-
-        _syncContext.Invoke();
+        
+        FrameEvent.Set();
 
         foreach (Primitive primitive in _toDraw)
         {

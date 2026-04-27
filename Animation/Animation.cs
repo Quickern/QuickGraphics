@@ -1,4 +1,4 @@
-﻿Canvas(640, 480);
+﻿await ForCanvas(640, 480);
 
 Vector velocity = (1, 2);
 Point position = (320, 240);
