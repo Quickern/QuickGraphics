@@ -2,7 +2,6 @@ using System.Numerics;
 using System.Reflection;
 using NvgNET;
 using NvgNET.Rendering.OpenGL;
-using QuickGraphics.Primitives;
 using Silk.NET.Maths;
 using Silk.NET.OpenGL;
 using Silk.NET.Windowing;
@@ -17,7 +16,7 @@ public partial class Canvas
     internal GL Gl { get => field ?? throw new InvalidOperationException("Gl called before initialization."); private set; }
     internal Nvg Nvg { get => field ?? throw new InvalidOperationException("NVG called before initialization."); private set; }
 
-    private readonly Queue<Primitive> _swapchain = new Queue<Primitive>();
+    private readonly PrimitivesDrawer _drawer;
 
     public bool IsClosed { get; private set; }
 
@@ -32,6 +31,8 @@ public partial class Canvas
     {
         Context = new CanvasSynchronizationContext();
         SynchronizationContext.SetSynchronizationContext(Context);
+
+        _drawer = new PrimitivesDrawer(this);
 
         WindowOptions windowOptions = WindowOptions.Default;
         windowOptions.FramesPerSecond = 60;
@@ -68,6 +69,8 @@ public partial class Canvas
 
     private void OnRender(double _DeltaTime)
     {
+        Context.Invoke();
+
         Vector2 winSize = Window.Size.As<float>().ToSystem();
         Vector2 fbSize = Window.FramebufferSize.As<float>().ToSystem();
 
@@ -76,14 +79,7 @@ public partial class Canvas
         Gl.Viewport(0, 0, (uint)fbSize.X, (uint)fbSize.Y);
 
         Nvg.BeginFrame(winSize, pxRatio);
-
-        Context.Invoke();
-
-        foreach (Primitive primitive in _swapchain)
-        {
-            primitive.Draw(this);
-        }
-
+        _drawer.Draw();
         Nvg.EndFrame();
     }
 

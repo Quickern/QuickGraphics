@@ -1,5 +1,3 @@
-using QuickGraphics.Primitives;
-
 namespace QuickGraphics;
 
 partial class Canvas
@@ -7,35 +5,11 @@ partial class Canvas
     public void Clear() => Clear(Colors.Black);
     public void Clear(Color color)
     {
-        _swapchain.Clear();
-
-        Clear clear = new Clear();
-        clear.Initialize(color);
-
-        _swapchain.Enqueue(clear);
+        _drawer.Clear();
+        _drawer.Enqueue(Primitives.Clear, new Clear(color));
     }
 
-    public void Line(Color color, Point first, Point second)
-    {
-        Line line = new Line { Color = color };
-        line.Initialize(first, second);
-
-        _swapchain.Enqueue(line);
-    }
-
-    public void Circle(Color color, Point center, int radius)
-    {
-        Circle circle = new Circle { Color = color };
-        circle.Initialize(center, radius);
-
-        _swapchain.Enqueue(circle);
-    }
-
-    public void Rectangle(Color color, Point topLeft, Size size)
-    {
-        Rectangle rect = new Rectangle { Color = color };
-        rect.Initialize(topLeft, size);
-
-        _swapchain.Enqueue(rect);
-    }
+    public void Line(Color color, Point first, Point second) => _drawer.Enqueue(Primitives.Line, new Line(color, first, second));
+    public void Circle(Color color, Point center, int radius) => _drawer.Enqueue(Primitives.Circle, new Circle(color, center, radius));
+    public void Rectangle(Color color, Point topLeft, Size size) => _drawer.Enqueue(Primitives.Rectangle, new Rectangle(color, topLeft, size));
 }
