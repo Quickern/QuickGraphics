@@ -1,14 +1,33 @@
 using NvgNET;
 using NvgNET.Graphics;
 using NvgNET.Paths;
+using Silk.NET.OpenGL;
 
-namespace QuickGraphics;
+namespace QuickGraphics.Primitives;
 
 internal abstract class Primitive
 {
     public Color Color { get; set; }
 
+    protected Colour GetNvgColor(Canvas canvas) => canvas.Nvg.Rgba(Color.R, Color.G, Color.B, Color.A);
+
     public abstract void Draw(Canvas canvas);
+}
+
+internal class Clear : Primitive
+{
+    public void Initialize(Color color)
+    {
+        Color = color;
+    }
+
+    public override void Draw(Canvas canvas)
+    {
+        Colour color = GetNvgColor(canvas);
+
+        canvas.Gl.ClearColor(color.R, color.G, color.B, Color.A);
+        canvas.Gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
+    }
 }
 
 internal class Line : Primitive
@@ -27,9 +46,9 @@ internal class Line : Primitive
         canvas.Nvg.Save();
 
         canvas.Nvg.StrokeColour(canvas.Nvg.Rgba(Color.R, Color.G, Color.B, Color.A));
-        
+
         canvas.Nvg.StrokeWidth(2);
-        
+
         canvas.Nvg.BeginPath();
         canvas.Nvg.MoveTo(_first.X, _first.Y);
         canvas.Nvg.LineTo(_second.X, _second.Y);
@@ -54,11 +73,11 @@ internal class Circle : Primitive
     {
         canvas.Nvg.Save();
 
-        canvas.Nvg.StrokeColour(canvas.Nvg.Rgba(Color.R, Color.G, Color.B, Color.A));
-        canvas.Nvg.FillColour(canvas.Nvg.Rgba(Color.R, Color.G, Color.B, Color.A));
-        
+        canvas.Nvg.StrokeColour(GetNvgColor(canvas));
+        canvas.Nvg.FillColour(GetNvgColor(canvas));
+
         canvas.Nvg.StrokeWidth(2);
-        
+
         canvas.Nvg.BeginPath();
 
         canvas.Nvg.Circle(_center.X, _center.Y, _radius);
@@ -84,11 +103,11 @@ internal class Rectangle : Primitive
     {
         canvas.Nvg.Save();
 
-        canvas.Nvg.StrokeColour(canvas.Nvg.Rgba(Color.R, Color.G, Color.B, Color.A));
-        canvas.Nvg.FillColour(canvas.Nvg.Rgba(Color.R, Color.G, Color.B, Color.A));
-        
+        canvas.Nvg.StrokeColour(GetNvgColor(canvas));
+        canvas.Nvg.FillColour(GetNvgColor(canvas));
+
         canvas.Nvg.StrokeWidth(2);
-        
+
         canvas.Nvg.BeginPath();
 
         canvas.Nvg.Rect(_topLeft.X, _topLeft.Y, _size.Width, _size.Height);

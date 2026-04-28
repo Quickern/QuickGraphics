@@ -15,10 +15,11 @@
     <Project Path="Nvg.NET/src/rendering/Nvg.Rendering.OpenGL/Nvg.Rendering.OpenGL.csproj" />
     <Project Path="Nvg.NET/src/rendering/Nvg.Rendering/Nvg.Rendering.csproj" />
   </Folder>
-  <Folder Name="/QuickGraphics/">
-    <Project Path="QuickGraphics/QuickGraphics.csproj" />
+
+  <Project Path="QuickGraphics/QuickGraphics.csproj" />
+
+  <Folder Name="/Samples/">
+    <Project Path="Simple/Simple.csproj" />
+    <Project Path="Animation/Animation.csproj" />
   </Folder>
-  <!-- <Project Path="ClassLibrary1/ClassLibrary1.csproj" /> -->
-  <Project Path="Simple/Simple.csproj" />
-  <Project Path="Animation/Animation.csproj" />
 </Solution>

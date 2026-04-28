@@ -14,7 +14,11 @@
 	</ItemGroup>
 
   <ItemGroup>
-      <ProjectReference Include="../Nvg.NET/src/rendering/Nvg.Rendering.OpenGL/Nvg.Rendering.OpenGL.csproj" />
+    <ProjectReference Include="../Nvg.NET/src/rendering/Nvg.Rendering.OpenGL/Nvg.Rendering.OpenGL.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Globals.cs" />
   </ItemGroup>
 
 </Project>

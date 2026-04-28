@@ -5,7 +5,7 @@ Point position = (320, 240);
 
 while (!IsClosed)
 {
-    ClearCanvas();
+    Clear();
 
     Rectangle(Red, position, (20, 20));
 
