@@ -5,13 +5,18 @@ using Silk.NET.OpenGL;
 
 namespace QuickGraphics.Primitives;
 
-internal abstract class Primitive
+internal abstract class Primitive : IDisposable
 {
     public Color Color { get; set; }
 
     protected Colour GetNvgColor(Canvas canvas) => canvas.Nvg.Rgba(Color.R, Color.G, Color.B, Color.A);
 
     public abstract void Draw(Canvas canvas);
+
+    public void Dispose()
+    {
+        // TODO: Return to pool.
+    }
 }
 
 internal class Clear : Primitive

@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace QuickGraphics;
 
 public static class StaticCanvas
@@ -16,31 +18,11 @@ public static class StaticCanvas
     public static Task ForFrame => Canvas.ForFrame;
     public static Task ForExit => Canvas.ForExit;
 
-    public static CanvasAwaitable ForCanvas(int width, int height)
+    public static CanvasRunAwaitable ForCanvas(int width, int height)
     {
         s_canvas = new Canvas(new Size(width, height));
 
-        TaskCompletionSource tcs = new TaskCompletionSource();
-
-        Thread mainThread = new Thread(() =>
-        {
-            Thread.CurrentThread.Name = "Canvas Thread";
-
-            SingleThreadSynchronizationContext context = new SingleThreadSynchronizationContext();
-            SynchronizationContext.SetSynchronizationContext(context);
-
-            tcs.TrySetResult();
-
-            while (!s_canvas.IsClosed)
-            {
-                s_canvas.FrameEvent.WaitOne();
-
-                context.Invoke();
-            }
-        });
-        mainThread.Start();
-
-        return new CanvasAwaitable(s_canvas, tcs.Task);
+        return new CanvasRunAwaitable(s_canvas);
     }
 
     public static void Clear() => Canvas.Clear();

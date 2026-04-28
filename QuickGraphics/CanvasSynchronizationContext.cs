@@ -2,7 +2,7 @@ using System.Collections.Concurrent;
 
 namespace QuickGraphics;
 
-public class SingleThreadSynchronizationContext : SynchronizationContext
+public class CanvasSynchronizationContext : SynchronizationContext
 {
     readonly ConcurrentQueue<(SendOrPostCallback D, object? State)> m_Queue = new();
     readonly Thread m_MainThread = Thread.CurrentThread;

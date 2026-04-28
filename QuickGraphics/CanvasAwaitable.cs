@@ -2,32 +2,30 @@ using System.Runtime.CompilerServices;
 
 namespace QuickGraphics;
 
-public readonly struct CanvasAwaitable : INotifyCompletion
+public readonly struct CanvasRunAwaitable : INotifyCompletion
 {
     private readonly Canvas _canvas;
-    private readonly Task _task;
 
-    public CanvasAwaitable()
+    public CanvasRunAwaitable()
     {
-        throw new ArgumentException($"You can't create {nameof(CanvasAwaitable)} outside of the canvas!");
+        throw new NoCanvasException($"You can't create {nameof(CanvasRunAwaitable)} outside of the canvas!");
     }
 
-    internal CanvasAwaitable(Canvas canvas, Task task)
+    internal CanvasRunAwaitable(Canvas canvas)
     {
         _canvas = canvas;
-        _task = task;
     }
 
     public bool IsCompleted { get; }
 
     public void OnCompleted(Action _Continuation)
     {
-        _task.ContinueWith((_, _) => _Continuation(), TaskContinuationOptions.ExecuteSynchronously);
+        _Continuation();
 
         _canvas.Run();
     }
 
     public void GetResult() { }
 
-    public CanvasAwaitable GetAwaiter() => this;
+    public CanvasRunAwaitable GetAwaiter() => this;
 }

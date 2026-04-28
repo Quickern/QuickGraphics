@@ -14,8 +14,7 @@ while (!IsClosed)
     if (position.Y <= 0 || position.Y + 20 >= CanvasHeight)
         velocity.Y = -velocity.Y;
 
-    position.X += velocity.X;
-    position.Y += velocity.Y;
+    position += velocity;
 
     await ForFrame;
 }

@@ -1,5 +1,6 @@
 using System.Numerics;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using NvgNET;
 using NvgNET.Rendering.OpenGL;
 using QuickGraphics.Primitives;
@@ -11,12 +12,14 @@ namespace QuickGraphics;
 
 public partial class Canvas
 {
+    CanvasSynchronizationContext _context;
+
     internal IWindow Window { get; }
 
     internal GL Gl { get => field ?? throw new Exception(); private set; }
     internal Nvg Nvg { get => field ?? throw new Exception(); private set; }
 
-    private readonly Queue<Primitive> _toDraw = new Queue<Primitive>();
+    private readonly Queue<Primitive> _swapchain = new Queue<Primitive>();
 
     public bool IsClosed { get; private set; }
 
@@ -28,10 +31,11 @@ public partial class Canvas
 
     public Size Size => new Size(Window.Size.X, Window.Size.Y);
 
-    public AutoResetEvent FrameEvent { get; } = new AutoResetEvent(false);
-
     public Canvas(Size size)
     {
+        _context = new CanvasSynchronizationContext();
+        SynchronizationContext.SetSynchronizationContext(_context);
+
         WindowOptions windowOptions = WindowOptions.Default;
         windowOptions.FramesPerSecond = 60;
         windowOptions.ShouldSwapAutomatically = true;
@@ -57,11 +61,6 @@ public partial class Canvas
         }
     }
 
-    private void EnqueuePrimitive(Primitive primitive)
-    {
-        _toDraw.Enqueue(primitive);
-    }
-
     private void OnLoad()
     {
         Gl = Window.CreateOpenGL();
@@ -85,9 +84,9 @@ public partial class Canvas
         _frameTcs = new TaskCompletionSource();
         frameTcs.TrySetResult();
 
-        FrameEvent.Set();
+        _context.Invoke();
 
-        foreach (Primitive primitive in _toDraw)
+        foreach (Primitive primitive in _swapchain)
         {
             primitive.Draw(this);
         }
@@ -104,8 +103,7 @@ public partial class Canvas
         frameTcs.TrySetResult();
 
         _tcs.TrySetResult();
-
-        FrameEvent.Set();
+        _context.Invoke();
 
         Nvg.Dispose();
         Gl.Dispose();
