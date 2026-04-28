@@ -1,6 +1,5 @@
 using System.Numerics;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using NvgNET;
 using NvgNET.Rendering.OpenGL;
 using QuickGraphics.Primitives;
@@ -12,12 +11,11 @@ namespace QuickGraphics;
 
 public partial class Canvas
 {
-    CanvasSynchronizationContext _context;
-
+    internal CanvasSynchronizationContext Context { get; }
     internal IWindow Window { get; }
 
-    internal GL Gl { get => field ?? throw new Exception(); private set; }
-    internal Nvg Nvg { get => field ?? throw new Exception(); private set; }
+    internal GL Gl { get => field ?? throw new InvalidOperationException("Gl called before initialization."); private set; }
+    internal Nvg Nvg { get => field ?? throw new InvalidOperationException("NVG called before initialization."); private set; }
 
     private readonly Queue<Primitive> _swapchain = new Queue<Primitive>();
 
@@ -26,15 +24,14 @@ public partial class Canvas
     private readonly TaskCompletionSource _tcs = new TaskCompletionSource();
     public Task ForExit => _tcs.Task;
 
-    private TaskCompletionSource _frameTcs = new TaskCompletionSource();
-    public Task ForFrame => _frameTcs.Task;
+    public FrameAwaitable ForFrame => new FrameAwaitable(this);
 
     public Size Size => new Size(Window.Size.X, Window.Size.Y);
 
     public Canvas(Size size)
     {
-        _context = new CanvasSynchronizationContext();
-        SynchronizationContext.SetSynchronizationContext(_context);
+        Context = new CanvasSynchronizationContext();
+        SynchronizationContext.SetSynchronizationContext(Context);
 
         WindowOptions windowOptions = WindowOptions.Default;
         windowOptions.FramesPerSecond = 60;
@@ -80,11 +77,7 @@ public partial class Canvas
 
         Nvg.BeginFrame(winSize, pxRatio);
 
-        TaskCompletionSource frameTcs = _frameTcs;
-        _frameTcs = new TaskCompletionSource();
-        frameTcs.TrySetResult();
-
-        _context.Invoke();
+        Context.Invoke();
 
         foreach (Primitive primitive in _swapchain)
         {
@@ -98,12 +91,8 @@ public partial class Canvas
     {
         IsClosed = true;
 
-        TaskCompletionSource frameTcs = _frameTcs;
-        _frameTcs = new TaskCompletionSource();
-        frameTcs.TrySetResult();
-
         _tcs.TrySetResult();
-        _context.Invoke();
+        Context.Invoke();
 
         Nvg.Dispose();
         Gl.Dispose();

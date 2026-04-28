@@ -13,7 +13,7 @@ public static class StaticCanvas
     public static int CanvasWidth => CanvasSize.Width;
     public static int CanvasHeight => CanvasSize.Height;
 
-    public static Task ForFrame => Canvas.ForFrame;
+    public static FrameAwaitable ForFrame => Canvas.ForFrame;
     public static Task ForExit => Canvas.ForExit;
 
     public static CanvasRunAwaitable ForCanvas(int width, int height)

@@ -1,13 +1,16 @@
 using System.Collections.Concurrent;
+using System.Collections.Frozen;
+using Frame = (System.Threading.SendOrPostCallback D, object? State);
 
 namespace QuickGraphics;
 
 public class CanvasSynchronizationContext : SynchronizationContext
 {
-    readonly ConcurrentQueue<(SendOrPostCallback D, object? State)> m_Queue = new();
-    readonly Thread m_MainThread = Thread.CurrentThread;
+    readonly ConcurrentQueue<Frame> _queue = new();
+    readonly Queue<Frame> _currentThreadQueue = new();
+    readonly Thread _mainThread = Thread.CurrentThread;
 
-    public bool IsMainThread => m_MainThread == Thread.CurrentThread;
+    public bool IsMainThread => _mainThread == Thread.CurrentThread;
 
     public override void Send(SendOrPostCallback _D, object? _State)
     {
@@ -20,7 +23,7 @@ public class CanvasSynchronizationContext : SynchronizationContext
         else
         {
             using ManualResetEvent evt = new ManualResetEvent(false);
-            m_Queue.Enqueue((_S => {
+            _queue.Enqueue((_S => {
                 try
                 {
                     _D(_S);
@@ -39,12 +42,17 @@ public class CanvasSynchronizationContext : SynchronizationContext
     {
         ArgumentNullException.ThrowIfNull(_D);
 
-        m_Queue.Enqueue((_D, _State));
+        _queue.Enqueue((_D, _State));
     }
 
     public void Invoke()
     {
-        while (m_Queue.TryDequeue(out (SendOrPostCallback D, object? State) fromQueue))
+        while (_queue.TryDequeue(out Frame fromQueue))
+        {
+            _currentThreadQueue.Enqueue(fromQueue);
+        }
+
+        while (_currentThreadQueue.TryDequeue(out Frame fromQueue))
         {
             fromQueue.D(fromQueue.State);
         }
