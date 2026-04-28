@@ -1,5 +1,3 @@
-using System.Runtime.CompilerServices;
-
 namespace QuickGraphics;
 
 public static class StaticCanvas
