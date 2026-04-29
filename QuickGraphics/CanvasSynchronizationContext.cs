@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using System.Collections.Frozen;
 using Frame = (System.Threading.SendOrPostCallback D, object? State);
 
 namespace QuickGraphics;
@@ -45,7 +44,7 @@ public class CanvasSynchronizationContext : SynchronizationContext
         _queue.Enqueue((_D, _State));
     }
 
-    public void Invoke()
+    public virtual void Invoke()
     {
         while (_queue.TryDequeue(out Frame fromQueue))
         {

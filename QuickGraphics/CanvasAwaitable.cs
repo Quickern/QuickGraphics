@@ -15,7 +15,7 @@ public readonly struct CanvasRunAwaitable : INotifyCompletion
     internal CanvasRunAwaitable(Canvas canvas)
     {
         _canvas = canvas;
-        _context = SynchronizationContext.Current;
+        _context = canvas.Context;
     }
 
     public bool IsCompleted { get; }

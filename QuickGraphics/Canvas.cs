@@ -1,17 +1,12 @@
-using System.Numerics;
-using System.Reflection;
 using NvgNET;
 using NvgNET.Rendering.OpenGL;
-using Silk.NET.Maths;
 using Silk.NET.OpenGL;
-using Silk.NET.Windowing;
 
 namespace QuickGraphics;
 
 public partial class Canvas
 {
     internal CanvasSynchronizationContext Context { get; }
-    internal IWindow Window { get; }
 
     internal GL Gl { get => field ?? throw new InvalidOperationException("Gl called before initialization."); private set; }
     internal Nvg Nvg { get => field ?? throw new InvalidOperationException("NVG called before initialization."); private set; }
@@ -25,77 +20,75 @@ public partial class Canvas
 
     public FrameAwaitable ForFrame => new FrameAwaitable(this);
 
-    public Size Size => new Size(Window.Size.X, Window.Size.Y);
+    public Size Size { get; }
+    public virtual Size FramebufferSize { get; set; }
 
-    public Canvas(Size size)
+    public Canvas(CanvasSynchronizationContext context, Size size)
     {
-        Context = new CanvasSynchronizationContext();
-        SynchronizationContext.SetSynchronizationContext(Context);
+        Context = context;
+        Size = size;
 
         _drawer = new PrimitivesDrawer(this);
-
-        WindowOptions windowOptions = WindowOptions.Default;
-        windowOptions.FramesPerSecond = 60;
-        windowOptions.ShouldSwapAutomatically = true;
-        windowOptions.Size = new Vector2D<int>(size.Width, size.Height);
-        windowOptions.Title = Assembly.GetEntryAssembly()?.GetName().Name ?? "Canvas";
-        windowOptions.VSync = false;
-        windowOptions.PreferredDepthBufferBits = 24;
-        windowOptions.PreferredStencilBufferBits = 8;
-
-        Window = Silk.NET.Windowing.Window.Create(windowOptions);
-        Window.Load += OnLoad;
-        Window.Render += OnRender;
-        Window.Closing += OnClose;
 
         Clear();
     }
 
-    public void Run()
-    {
-        if (!Window.IsInitialized)
-        {
-            Window.Run();
-        }
-    }
+    public virtual void Run() { }
 
-    private void OnLoad()
+    public void Load(GL gl)
     {
-        Gl = Window.CreateOpenGL();
+        Gl = gl;
 
         OpenGLRenderer nvgRenderer = new(CreateFlags.StencilStrokes | CreateFlags.Debug, Gl);
         Nvg = Nvg.Create(nvgRenderer);
     }
 
-    private void OnRender(double _DeltaTime)
+    public void Render()
     {
         Context.Invoke();
 
-        Vector2 winSize = Window.Size.As<float>().ToSystem();
-        Vector2 fbSize = Window.FramebufferSize.As<float>().ToSystem();
+        Size winSize = Size;
+        Size fbSize = FramebufferSize;
 
-        float pxRatio = fbSize.X / winSize.X;
+        double winAspect = (double)winSize.Width / winSize.Height;
+        double fbAspect = (double)fbSize.Width / fbSize.Height;
 
-        Gl.Viewport(0, 0, (uint)fbSize.X, (uint)fbSize.Y);
+        Size finalSize = fbSize;
+        if (winAspect > fbAspect)
+        {
+            finalSize.Height = (int)(fbSize.Width / winAspect);
+        }
+        else if (winAspect < fbAspect)
+        {
+            finalSize.Width = (int)(fbSize.Height * winAspect);
+        }
 
-        Nvg.BeginFrame(winSize, pxRatio);
+        float pxRatio = (float)finalSize.Width / winSize.Width;
+
+        Gl.Viewport((fbSize.Width - finalSize.Width) / 2, (fbSize.Height - finalSize.Height) / 2, (uint)finalSize.Width, (uint)finalSize.Height);
+
+        Nvg.BeginFrame(winSize.Width, winSize.Height, pxRatio);
         _drawer.Draw();
         Nvg.EndFrame();
     }
 
-    private void OnClose()
+    public void Close()
     {
+        if (IsClosed)
+        {
+            return;
+        }
+
         IsClosed = true;
 
         _tcs.TrySetResult();
         Context.Invoke();
 
         Nvg.Dispose();
-        Gl.Dispose();
     }
 
-    public void Dispose()
+    public virtual void Dispose()
     {
-        Window.Dispose();
+        Close();
     }
 }

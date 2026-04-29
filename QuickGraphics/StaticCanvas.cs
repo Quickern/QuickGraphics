@@ -2,6 +2,8 @@ namespace QuickGraphics;
 
 public static class StaticCanvas
 {
+    public static Func<Size, Canvas> CanvasResolver { get; set; } = size => new WindowCanvas(size);
+
     private static Canvas? s_canvas;
 
     public static bool IsClosed => Canvas.IsClosed;
@@ -18,7 +20,7 @@ public static class StaticCanvas
 
     public static CanvasRunAwaitable ForCanvas(int width, int height)
     {
-        s_canvas = new Canvas(new Size(width, height));
+        s_canvas = CanvasResolver(new Size(width, height));
 
         return new CanvasRunAwaitable(s_canvas);
     }
