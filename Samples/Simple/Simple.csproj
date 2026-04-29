@@ -8,11 +8,11 @@
   </PropertyGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="../QuickGraphics/QuickGraphics.csproj" />
+	  <ProjectReference Include="../../QuickGraphics/QuickGraphics.csproj" />
 	</ItemGroup>
 
   <ItemGroup>
-    <Compile Include="../QuickGraphics/Globals.cs" Visible="False" />
+    <Compile Include="../../QuickGraphics/Globals.cs" Visible="False" />
   </ItemGroup>
 
 </Project>
