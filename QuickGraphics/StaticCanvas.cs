@@ -2,7 +2,7 @@ namespace QuickGraphics;
 
 public static class StaticCanvas
 {
-    public static Func<Size, Canvas> CanvasResolver { get; set; } = size => new WindowCanvas(size);
+    internal static Func<Size, Canvas> CanvasResolver { get; set; } = size => new WindowCanvas(size);
 
     private static Canvas? s_canvas;
 
