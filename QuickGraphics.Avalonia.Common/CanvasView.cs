@@ -66,6 +66,24 @@ public class CanvasView(Canvas canvas) : OpenGlControlBase
         RequestNextFrameRendering();
     }
 
+    protected override global::Avalonia.Size MeasureOverride(global::Avalonia.Size availableSize)
+    {
+        global::Avalonia.Size canvasSize = new global::Avalonia.Size(_canvas.Size.Width, _canvas.Size.Height);
+
+        (double width, double height) = availableSize;
+
+        if (canvasSize.AspectRatio > availableSize.AspectRatio)
+        {
+            height = availableSize.Width / canvasSize.AspectRatio;
+        }
+        else if (canvasSize.AspectRatio < availableSize.AspectRatio)
+        {
+            width = availableSize.Height * canvasSize.AspectRatio;
+        }
+
+        return new global::Avalonia.Size(width, height);
+    }
+
     protected override void OnOpenGlDeinit(GlInterface gl)
     {
         base.OnOpenGlDeinit(gl);
