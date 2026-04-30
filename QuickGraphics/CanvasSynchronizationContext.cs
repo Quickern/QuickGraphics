@@ -3,11 +3,13 @@ using Frame = (System.Threading.SendOrPostCallback D, object? State);
 
 namespace QuickGraphics;
 
-public class CanvasSynchronizationContext : SynchronizationContext
+public class CanvasSynchronizationContext : SynchronizationContext, IDisposable
 {
-    readonly ConcurrentQueue<Frame> _queue = new();
-    readonly Queue<Frame> _currentThreadQueue = new();
-    readonly Thread _mainThread = Thread.CurrentThread;
+    private readonly ConcurrentQueue<Frame> _queue = new();
+    private readonly Queue<Frame> _currentThreadQueue = new();
+    private readonly Thread _mainThread = Thread.CurrentThread;
+
+    private bool _isDisposed;
 
     public bool IsMainThread => _mainThread == Thread.CurrentThread;
 
@@ -15,7 +17,7 @@ public class CanvasSynchronizationContext : SynchronizationContext
     {
         ArgumentNullException.ThrowIfNull(_D);
 
-        if (IsMainThread)
+        if (IsMainThread || _isDisposed)
         {
             _D(_State);
         }
@@ -41,7 +43,14 @@ public class CanvasSynchronizationContext : SynchronizationContext
     {
         ArgumentNullException.ThrowIfNull(_D);
 
-        _queue.Enqueue((_D, _State));
+        if (_isDisposed)
+        {
+            _D(_State);
+        }
+        else
+        {
+            _queue.Enqueue((_D, _State));
+        }
     }
 
     public virtual void Invoke()
@@ -55,5 +64,10 @@ public class CanvasSynchronizationContext : SynchronizationContext
         {
             fromQueue.D(fromQueue.State);
         }
+    }
+
+    public void Dispose()
+    {
+        _isDisposed = true;
     }
 }

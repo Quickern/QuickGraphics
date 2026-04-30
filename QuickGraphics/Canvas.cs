@@ -84,6 +84,7 @@ public partial class Canvas
         _tcs.TrySetResult();
         Context.Invoke();
 
+        Context.Dispose();
         Nvg.Dispose();
     }
 
