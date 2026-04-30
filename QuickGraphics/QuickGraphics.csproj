@@ -21,4 +21,8 @@
     <Compile Remove="Globals.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Globals.cs" />
+  </ItemGroup>
+
 </Project>
