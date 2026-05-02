@@ -13,4 +13,5 @@ partial class Canvas
     public void Rectangle(Style style, Point topLeft, Size size) => _drawer.Enqueue(Primitives.Rectangle, new Rectangle(style, topLeft, size));
     public void Circle(Style style, Point center, int radius) => _drawer.Enqueue(Primitives.Circle, new Circle(style, center, radius));
     public void Ellipse(Style style, Point center, int radiusX, int radiusY) => _drawer.Enqueue(Primitives.Ellipse, new Ellipse(style, center, radiusX, radiusY));
+    public void Bezier(Style style, Point p0, Point p1, Point p2, Point p3) => _drawer.Enqueue(Primitives.Bezier, new Bezier(style, p0, p1, p2, p3));
 }

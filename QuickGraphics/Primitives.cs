@@ -16,6 +16,7 @@ internal static class Primitives
     public static readonly byte Rectangle = Add<Rectangle>(QuickGraphics.Rectangle.Draw);
     public static readonly byte Circle = Add<Circle>(QuickGraphics.Circle.Draw);
     public static readonly byte Ellipse = Add<Ellipse>(QuickGraphics.Ellipse.Draw);
+    public static readonly byte Bezier = Add<Bezier>(QuickGraphics.Bezier.Draw);
 
     public delegate void Handler(Canvas canvas, ref ReadOnlySpan<byte> data);
 
@@ -27,6 +28,38 @@ internal static class Primitives
     }
 
     public static Colour GetNvgColor(Canvas canvas, Color color) => canvas.Nvg.Rgba(color.R, color.G, color.B, color.A);
+}
+
+internal ref struct DrawContext : IDisposable
+{
+    readonly Canvas _canvas;
+    readonly Style _style;
+
+    public DrawContext(Canvas canvas, Style style)
+    {
+        _canvas = canvas;
+        _style = style;
+
+        _canvas.Nvg.Save();
+
+        if ((_style.Type & StyleType.Stroke) == StyleType.Stroke)
+        {
+            _canvas.Nvg.StrokeColour(Primitives.GetNvgColor(_canvas, _style.Paint.Color));
+            _canvas.Nvg.StrokeWidth(_style.StrokeWidth);
+        }
+        if ((_style.Type & StyleType.Fill) == StyleType.Fill)
+            _canvas.Nvg.FillColour(Primitives.GetNvgColor(_canvas, _style.Paint.Color));
+    }
+
+    public void Dispose()
+    {
+        if ((_style.Type & StyleType.Fill) == StyleType.Fill)
+            _canvas.Nvg.Fill();
+        if ((_style.Type & StyleType.Stroke) == StyleType.Stroke)
+            _canvas.Nvg.Stroke();
+
+        _canvas.Nvg.Restore();
+    }
 }
 
 internal record struct Clear(Color Color)
@@ -48,7 +81,7 @@ internal record struct Line(Style Style, Point First, Point Second)
     {
         ref readonly Line line = ref MemoryMarshal.AsRef<Line>(data);
 
-        if (!line.Style.Type.HasFlag(StyleType.Stroke))
+        if ((line.Style.Type | StyleType.Stroke) != StyleType.Stroke)
         {
             return;
         }
@@ -73,29 +106,10 @@ internal record struct Rectangle(Style Style, Point TopLeft, Size Size)
     {
         ref readonly Rectangle rect = ref MemoryMarshal.AsRef<Rectangle>(data);
 
-        canvas.Nvg.Save();
-
-        bool hasStroke = rect.Style.Type.HasFlag(StyleType.Stroke);
-        bool hasFill = rect.Style.Type.HasFlag(StyleType.Fill);
-
-        if (hasStroke)
-        {
-            canvas.Nvg.StrokeColour(Primitives.GetNvgColor(canvas, rect.Style.Paint.Color));
-            canvas.Nvg.StrokeWidth(rect.Style.StrokeWidth);
-        }
-        if (hasFill)
-            canvas.Nvg.FillColour(Primitives.GetNvgColor(canvas, rect.Style.Paint.Color));
+        using DrawContext context = new DrawContext(canvas, rect.Style);
 
         canvas.Nvg.BeginPath();
-
         canvas.Nvg.Rect(rect.TopLeft.X, rect.TopLeft.Y, rect.Size.Width, rect.Size.Height);
-
-        if (hasFill)
-            canvas.Nvg.Fill();
-        if (hasStroke)
-            canvas.Nvg.Stroke();
-
-        canvas.Nvg.Restore();
     }
 }
 
@@ -105,30 +119,10 @@ internal record struct Circle(Style Style, Point Center, int Radius)
     {
         ref readonly Circle circle = ref MemoryMarshal.AsRef<Circle>(data);
 
-        canvas.Nvg.Save();
-
-        bool hasStroke = circle.Style.Type.HasFlag(StyleType.Stroke);
-        bool hasFill = circle.Style.Type.HasFlag(StyleType.Fill);
-
-        if (hasStroke)
-        {
-            canvas.Nvg.StrokeColour(Primitives.GetNvgColor(canvas, circle.Style.Paint.Color));
-            canvas.Nvg.StrokeWidth(circle.Style.StrokeWidth);
-        }
-        if (hasFill)
-            canvas.Nvg.FillColour(Primitives.GetNvgColor(canvas, circle.Style.Paint.Color));
-
+        using DrawContext context = new DrawContext(canvas, circle.Style);
 
         canvas.Nvg.BeginPath();
-
         canvas.Nvg.Circle(circle.Center.X, circle.Center.Y, circle.Radius);
-
-        if (hasFill)
-            canvas.Nvg.Fill();
-        if (hasStroke)
-            canvas.Nvg.Stroke();
-
-        canvas.Nvg.Restore();
     }
 }
 
@@ -138,29 +132,23 @@ internal record struct Ellipse(Style Style, Point Center, int RadiusX, int Radiu
     {
         ref readonly Ellipse ellipse = ref MemoryMarshal.AsRef<Ellipse>(data);
 
-        canvas.Nvg.Save();
-
-        bool hasStroke = ellipse.Style.Type.HasFlag(StyleType.Stroke);
-        bool hasFill = ellipse.Style.Type.HasFlag(StyleType.Fill);
-
-        if (hasStroke)
-        {
-            canvas.Nvg.StrokeColour(Primitives.GetNvgColor(canvas, ellipse.Style.Paint.Color));
-            canvas.Nvg.StrokeWidth(ellipse.Style.StrokeWidth);
-        }
-        if (hasFill)
-            canvas.Nvg.FillColour(Primitives.GetNvgColor(canvas, ellipse.Style.Paint.Color));
-
+        using DrawContext context = new DrawContext(canvas, ellipse.Style);
 
         canvas.Nvg.BeginPath();
-
         canvas.Nvg.Ellipse(ellipse.Center.X, ellipse.Center.Y, ellipse.RadiusX, ellipse.RadiusY);
+    }
+}
 
-        if (hasFill)
-            canvas.Nvg.Fill();
-        if (hasStroke)
-            canvas.Nvg.Stroke();
+internal record struct Bezier(Style Style, Point P0, Point P1, Point P2, Point P3)
+{
+    public static void Draw(Canvas canvas, ref ReadOnlySpan<byte> data)
+    {
+        ref readonly Bezier bezier = ref MemoryMarshal.AsRef<Bezier>(data);
 
-        canvas.Nvg.Restore();
+        using DrawContext context = new DrawContext(canvas, bezier.Style);
+
+        canvas.Nvg.BeginPath();
+        canvas.Nvg.MoveTo(bezier.P0.X, bezier.P0.Y);
+        canvas.Nvg.BezierTo(bezier.P1.X, bezier.P1.Y, bezier.P2.X, bezier.P2.Y, bezier.P3.X, bezier.P3.Y);
     }
 }

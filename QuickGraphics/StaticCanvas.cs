@@ -32,4 +32,5 @@ public static class StaticCanvas
     public static void Rectangle(Style style, Point topLeft, Size size) => Canvas.Rectangle(style, topLeft, size);
     public static void Circle(Style style, Point center, int radius) => Canvas.Circle(style, center, radius);
     public static void Ellipse(Style style, Point center, int radiusX, int radiusY) => Canvas.Ellipse(style, center, radiusX, radiusY);
+    public static void Bezier(Style style, Point p0, Point p1, Point p2, Point p3) => Canvas.Bezier(style, p0, p1, p2, p3);
 }
