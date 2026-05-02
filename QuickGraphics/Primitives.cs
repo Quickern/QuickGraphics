@@ -13,8 +13,9 @@ internal static class Primitives
 
     public static readonly byte Clear = Add<Clear>(QuickGraphics.Clear.Draw);
     public static readonly byte Line = Add<Line>(QuickGraphics.Line.Draw);
-    public static readonly byte Circle = Add<Circle>(QuickGraphics.Circle.Draw);
     public static readonly byte Rectangle = Add<Rectangle>(QuickGraphics.Rectangle.Draw);
+    public static readonly byte Circle = Add<Circle>(QuickGraphics.Circle.Draw);
+    public static readonly byte Ellipse = Add<Ellipse>(QuickGraphics.Ellipse.Draw);
 
     public delegate void Handler(Canvas canvas, ref ReadOnlySpan<byte> data);
 
@@ -66,6 +67,38 @@ internal record struct Line(Style Style, Point First, Point Second)
     }
 }
 
+internal record struct Rectangle(Style Style, Point TopLeft, Size Size)
+{
+    public static void Draw(Canvas canvas, ref ReadOnlySpan<byte> data)
+    {
+        ref readonly Rectangle rect = ref MemoryMarshal.AsRef<Rectangle>(data);
+
+        canvas.Nvg.Save();
+
+        bool hasStroke = rect.Style.Type.HasFlag(StyleType.Stroke);
+        bool hasFill = rect.Style.Type.HasFlag(StyleType.Fill);
+
+        if (hasStroke)
+        {
+            canvas.Nvg.StrokeColour(Primitives.GetNvgColor(canvas, rect.Style.Paint.Color));
+            canvas.Nvg.StrokeWidth(rect.Style.StrokeWidth);
+        }
+        if (hasFill)
+            canvas.Nvg.FillColour(Primitives.GetNvgColor(canvas, rect.Style.Paint.Color));
+
+        canvas.Nvg.BeginPath();
+
+        canvas.Nvg.Rect(rect.TopLeft.X, rect.TopLeft.Y, rect.Size.Width, rect.Size.Height);
+
+        if (hasFill)
+            canvas.Nvg.Fill();
+        if (hasStroke)
+            canvas.Nvg.Stroke();
+
+        canvas.Nvg.Restore();
+    }
+}
+
 internal record struct Circle(Style Style, Point Center, int Radius)
 {
     public static void Draw(Canvas canvas, ref ReadOnlySpan<byte> data)
@@ -99,28 +132,29 @@ internal record struct Circle(Style Style, Point Center, int Radius)
     }
 }
 
-internal record struct Rectangle(Style Style, Point TopLeft, Size Size)
+internal record struct Ellipse(Style Style, Point Center, int RadiusX, int RadiusY)
 {
     public static void Draw(Canvas canvas, ref ReadOnlySpan<byte> data)
     {
-        ref readonly Rectangle rect = ref MemoryMarshal.AsRef<Rectangle>(data);
+        ref readonly Ellipse ellipse = ref MemoryMarshal.AsRef<Ellipse>(data);
 
         canvas.Nvg.Save();
 
-        bool hasStroke = rect.Style.Type.HasFlag(StyleType.Stroke);
-        bool hasFill = rect.Style.Type.HasFlag(StyleType.Fill);
+        bool hasStroke = ellipse.Style.Type.HasFlag(StyleType.Stroke);
+        bool hasFill = ellipse.Style.Type.HasFlag(StyleType.Fill);
 
         if (hasStroke)
         {
-            canvas.Nvg.StrokeColour(Primitives.GetNvgColor(canvas, rect.Style.Paint.Color));
-            canvas.Nvg.StrokeWidth(rect.Style.StrokeWidth);
+            canvas.Nvg.StrokeColour(Primitives.GetNvgColor(canvas, ellipse.Style.Paint.Color));
+            canvas.Nvg.StrokeWidth(ellipse.Style.StrokeWidth);
         }
         if (hasFill)
-            canvas.Nvg.FillColour(Primitives.GetNvgColor(canvas, rect.Style.Paint.Color));
+            canvas.Nvg.FillColour(Primitives.GetNvgColor(canvas, ellipse.Style.Paint.Color));
+
 
         canvas.Nvg.BeginPath();
 
-        canvas.Nvg.Rect(rect.TopLeft.X, rect.TopLeft.Y, rect.Size.Width, rect.Size.Height);
+        canvas.Nvg.Ellipse(ellipse.Center.X, ellipse.Center.Y, ellipse.RadiusX, ellipse.RadiusY);
 
         if (hasFill)
             canvas.Nvg.Fill();
