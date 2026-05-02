@@ -7,9 +7,9 @@ while (!IsClosed)
 {
     Clear(Blue);
 
-    Rectangle(Black, (0, 0), (CanvasWidth, CanvasHeight));
+    Rectangle(Fill(Black), (0, 0), (CanvasWidth, CanvasHeight));
 
-    Rectangle(Red, position, (20, 20));
+    Rectangle(Fill(Red), position, (20, 20));
 
     if (position.X <= 0 || position.X + 20 >= CanvasWidth)
         velocity.X = -velocity.X;

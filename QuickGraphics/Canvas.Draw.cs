@@ -9,7 +9,9 @@ partial class Canvas
         _drawer.Enqueue(Primitives.Clear, new Clear(color));
     }
 
-    public void Line(Color color, Point first, Point second) => _drawer.Enqueue(Primitives.Line, new Line(color, first, second));
-    public void Circle(Color color, Point center, int radius) => _drawer.Enqueue(Primitives.Circle, new Circle(color, center, radius));
-    public void Rectangle(Color color, Point topLeft, Size size) => _drawer.Enqueue(Primitives.Rectangle, new Rectangle(color, topLeft, size));
+    public void Line(Style style, Point first, Point second) => _drawer.Enqueue(Primitives.Line, new Line(style, first, second));
+
+    public void Circle(Style style, Point center, int radius) => _drawer.Enqueue(Primitives.Circle, new Circle(style, center, radius));
+
+    public void Rectangle(Style style, Point topLeft, Size size) => _drawer.Enqueue(Primitives.Rectangle, new Rectangle(style, topLeft, size));
 }

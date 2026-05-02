@@ -27,7 +27,9 @@ public static class StaticCanvas
 
     public static void Clear() => Canvas.Clear();
     public static void Clear(Color color) => Canvas.Clear(color);
-    public static void Line(Color color, Point first, Point second) => Canvas.Line(color, first, second);
-    public static void Rectangle(Color color, Point topLeft, Size size) => Canvas.Rectangle(color, topLeft, size);
-    public static void Circle(Color color, Point center, int radius) => Canvas.Circle(color, center, radius);
+
+    public static void Line(Style style, Point first, Point second) => Canvas.Line(style, first, second);
+    public static void Rectangle(Style style, Point topLeft, Size size) => Canvas.Rectangle(style, topLeft, size);
+    public static void Circle(Style style, Point center, int radius) => Canvas.Circle(style, center, radius);
+    // public static void Ellipse(Style style, Point centerX, Point centerY, int radius) => Canvas.Ellipse(style, centerX, centerY, radius);
 }

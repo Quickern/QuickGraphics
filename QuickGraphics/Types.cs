@@ -31,3 +31,28 @@ public record struct Color(byte R, byte G, byte B, byte A = 255)
 
     public static implicit operator Color((byte R, byte G, byte B, byte A) tuple) => new Color(tuple.R, tuple.G, tuple.B, tuple.A);
 }
+
+public record struct Paint(Color Color)
+{
+    public static implicit operator Paint(Color color) => new Paint(color);
+}
+
+public record struct Style(StyleType Type, Paint Paint, int StrokeWidth = 1)
+{
+    public static implicit operator Style(Paint paint) => Stroke(paint);
+    public static implicit operator Style((Paint Paint, int Width) value) => Stroke(value.Paint, value.Width);
+    public static implicit operator Style(Color color) => Stroke(color);
+    public static implicit operator Style((Color Color, int Width) value) => Stroke(value.Color, value.Width);
+
+    public static Style Fill(Paint paint) => new Style(StyleType.Fill, paint);
+    public static Style Stroke(Paint paint, int width = 1) => new Style(StyleType.Stroke, paint, width);
+}
+
+[Flags]
+public enum StyleType
+{
+    None          = 0,
+    Fill          = 1,
+    Stroke        = 1 << 1,
+    FillAndStroke = Fill | Stroke
+}
