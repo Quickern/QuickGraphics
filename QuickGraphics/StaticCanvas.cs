@@ -29,8 +29,10 @@ public static class StaticCanvas
     public static void Clear(Color color) => Canvas.Clear(color);
 
     public static void Line(Style style, Point first, Point second) => Canvas.Line(style, first, second);
+    public static void Line(Style style, Point first, Point second, params ReadOnlySpan<Point> points) => Canvas.Line(style, first, second, points);
     public static void Rectangle(Style style, Point topLeft, Size size) => Canvas.Rectangle(style, topLeft, size);
     public static void Circle(Style style, Point center, int radius) => Canvas.Circle(style, center, radius);
     public static void Ellipse(Style style, Point center, int radiusX, int radiusY) => Canvas.Ellipse(style, center, radiusX, radiusY);
     public static void Bezier(Style style, Point p0, Point p1, Point p2, Point p3) => Canvas.Bezier(style, p0, p1, p2, p3);
+    public static void Bezier(Style style, Point p0, Point p1, Point p2, Point p3, params ReadOnlySpan<Point> points) => Canvas.Bezier(style, p0, p1, p2, p3, points);
 }

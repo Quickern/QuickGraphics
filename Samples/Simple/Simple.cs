@@ -4,6 +4,7 @@ Line((Green, 4), (10, 20), (300, 400));
 Rectangle(Fill(Blue), (100, 200), (130, 240));
 
 Circle(Red, (320, 240), 100);
+Line(Fill(Red), (320, 140), (234, 290), (406, 290));
 
 Ellipse(Fill(White), (500, 100), 100, 40);
 

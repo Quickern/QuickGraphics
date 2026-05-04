@@ -20,6 +20,14 @@ internal class PrimitivesDrawer(Canvas canvas)
         Enqueue(id, value, ref additional);
     }
 
+    public void Enqueue<T, TData>(byte id, T value, ref ReadOnlySpan<TData> additionalData)
+        where T : unmanaged
+        where TData : unmanaged
+    {
+        ReadOnlySpan<byte> additional = MemoryMarshal.AsBytes(additionalData);
+        Enqueue(id, value, ref additional);
+    }
+
     public void Enqueue<T>(byte id, T value, ref readonly ReadOnlySpan<byte> additionalBytes) where T : unmanaged
     {
         _queue.Add(id);

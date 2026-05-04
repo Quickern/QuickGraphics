@@ -36,6 +36,14 @@ internal static class Primitives
         ref readonly T value = ref MemoryMarshal.AsRef<T>(data[index..(index+=size)]);
         return ref value;
     }
+
+    public static ReadOnlySpan<T> GetData<T>(ref readonly ReadOnlySpan<byte> data, int count, ref int index) where T : unmanaged
+    {
+        int size = Unsafe.SizeOf<T>() * count;
+
+        ReadOnlySpan<T> value = MemoryMarshal.Cast<byte, T>(data[index..(index+=size)]);
+        return value;
+    }
 }
 
 internal ref struct DrawContext : IDisposable
@@ -83,28 +91,23 @@ internal record struct Clear(Color Color)
     }
 }
 
-internal record struct Line(Style Style, Point First, Point Second)
+internal record struct Line(Style Style, Point First, Point Second, int AdditionalPointsCount)
 {
     public static void Draw(Canvas canvas, ref ReadOnlySpan<byte> data, ref int index)
     {
         ref readonly Line line = ref Primitives.GetStruct<Line>(ref data, ref index);
 
-        if ((line.Style.Type | StyleType.Stroke) != StyleType.Stroke)
-        {
-            return;
-        }
-
-        canvas.Nvg.Save();
-
-        canvas.Nvg.StrokeColour(Primitives.GetNvgColor(canvas, line.Style.Paint.Color));
-        canvas.Nvg.StrokeWidth(line.Style.StrokeWidth);
+        using DrawContext context = new DrawContext(canvas, line.Style);
 
         canvas.Nvg.BeginPath();
         canvas.Nvg.MoveTo(line.First.X, line.First.Y);
-        canvas.Nvg.LineTo(line.Second.X, line.Second.Y);
-        canvas.Nvg.Stroke();
 
-        canvas.Nvg.Restore();
+        canvas.Nvg.LineTo(line.Second.X, line.Second.Y);
+        for (int i = 0; i < line.AdditionalPointsCount; i++)
+        {
+            ref readonly Point point = ref Primitives.GetStruct<Point>(ref data, ref index);
+            canvas.Nvg.LineTo(point.X, point.Y);
+        }
     }
 }
 
@@ -147,7 +150,7 @@ internal record struct Ellipse(Style Style, Point Center, int RadiusX, int Radiu
     }
 }
 
-internal record struct Bezier(Style Style, Point P0, Point P1, Point P2, Point P3)
+internal record struct Bezier(Style Style, Point P0, Point P1, Point P2, Point P3, int AdditionalPointsCount)
 {
     public static void Draw(Canvas canvas, ref ReadOnlySpan<byte> data, ref int index)
     {
@@ -157,6 +160,14 @@ internal record struct Bezier(Style Style, Point P0, Point P1, Point P2, Point P
 
         canvas.Nvg.BeginPath();
         canvas.Nvg.MoveTo(bezier.P0.X, bezier.P0.Y);
+
         canvas.Nvg.BezierTo(bezier.P1.X, bezier.P1.Y, bezier.P2.X, bezier.P2.Y, bezier.P3.X, bezier.P3.Y);
+        for (int i = 0; i + 2 < bezier.AdditionalPointsCount; i+=3)
+        {
+            ref readonly Point p1 = ref Primitives.GetStruct<Point>(ref data, ref index);
+            ref readonly Point p2 = ref Primitives.GetStruct<Point>(ref data, ref index);
+            ref readonly Point p3 = ref Primitives.GetStruct<Point>(ref data, ref index);
+            canvas.Nvg.BezierTo(p1.X, p1.Y, p2.X, p2.Y, p3.X, p3.Y);
+        }
     }
 }
