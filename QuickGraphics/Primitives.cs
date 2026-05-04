@@ -167,6 +167,7 @@ internal record struct Bezier(Style Style, Point P0, Point P1, Point P2, Point P
             ref readonly Point p1 = ref Primitives.GetStruct<Point>(ref data, ref index);
             ref readonly Point p2 = ref Primitives.GetStruct<Point>(ref data, ref index);
             ref readonly Point p3 = ref Primitives.GetStruct<Point>(ref data, ref index);
+
             canvas.Nvg.BezierTo(p1.X, p1.Y, p2.X, p2.Y, p3.X, p3.Y);
         }
     }

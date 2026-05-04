@@ -44,8 +44,9 @@ public record struct Style(StyleType Type, Paint Paint, int StrokeWidth = 1)
     public static implicit operator Style(Color color) => Stroke(color);
     public static implicit operator Style((Color Color, int Width) value) => Stroke(value.Color, value.Width);
 
-    public static Style Fill(Paint paint) => new Style(StyleType.Fill, paint);
+    public static Style Fill(Paint paint, int width = 1) => new Style(StyleType.StrokeAndFill, paint, width);
     public static Style Stroke(Paint paint, int width = 1) => new Style(StyleType.Stroke, paint, width);
+    public static Style OnlyFill(Paint paint) => new Style(StyleType.Fill, paint);
 }
 
 [Flags]
@@ -54,5 +55,5 @@ public enum StyleType
     None          = 0,
     Fill          = 1,
     Stroke        = 1 << 1,
-    FillAndStroke = Fill | Stroke
+    StrokeAndFill = Fill | Stroke
 }
