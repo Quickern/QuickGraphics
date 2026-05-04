@@ -19,7 +19,9 @@
   <Project Path="QuickGraphics/QuickGraphics.csproj" />
 
   <Folder Name="/Samples/">
+    <Project Path="Samples/Eyes/Eyes.csproj" />
     <Project Path="Samples/Simple/Simple.csproj" />
+    <Project Path="Samples/AimTarget/AimTarget.csproj" />
     <Project Path="Samples/Animation/Animation.csproj" />
   </Folder>
 </Solution>

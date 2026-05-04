@@ -27,7 +27,7 @@ internal static class Primitives
         return index;
     }
 
-    public static Colour GetNvgColor(Canvas canvas, Color color) => canvas.Nvg.Rgba(color.R, color.G, color.B, color.A);
+    public static Colour GetNvgColor(Canvas canvas, Color color) => canvas.Nvg.Rgba(color.Red, color.Green, color.Blue, color.Alpha);
 
     public static ref readonly T GetStruct<T>(ref readonly ReadOnlySpan<byte> data, ref int index) where T : unmanaged
     {

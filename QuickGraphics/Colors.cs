@@ -312,7 +312,7 @@ public static class Colors
             255
         );
         if (color == 6)
-            result.G = (byte) (result.G / 2);
+            result.Green = (byte) (result.Green / 2);
         return result;
     }
 }
