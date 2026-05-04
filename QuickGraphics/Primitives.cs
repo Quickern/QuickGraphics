@@ -9,7 +9,7 @@ namespace QuickGraphics;
 
 internal static class Primitives
 {
-    public static List<(int DataSize, Handler Draw)> Handlers { get; } = [];
+    public static List<Handler> Handlers { get; } = [];
 
     public static readonly byte Clear = Add<Clear>(QuickGraphics.Clear.Draw);
     public static readonly byte Line = Add<Line>(QuickGraphics.Line.Draw);
@@ -18,16 +18,24 @@ internal static class Primitives
     public static readonly byte Ellipse = Add<Ellipse>(QuickGraphics.Ellipse.Draw);
     public static readonly byte Bezier = Add<Bezier>(QuickGraphics.Bezier.Draw);
 
-    public delegate void Handler(Canvas canvas, ref ReadOnlySpan<byte> data);
+    public delegate void Handler(Canvas canvas, ref ReadOnlySpan<byte> data, ref int index);
 
     public static byte Add<T>(Handler handler) where T : unmanaged
     {
         byte index = (byte)Handlers.Count;
-        Handlers.Add((Unsafe.SizeOf<T>(), handler));
+        Handlers.Add(handler);
         return index;
     }
 
     public static Colour GetNvgColor(Canvas canvas, Color color) => canvas.Nvg.Rgba(color.R, color.G, color.B, color.A);
+
+    public static ref readonly T GetStruct<T>(ref readonly ReadOnlySpan<byte> data, ref int index) where T : unmanaged
+    {
+        int size = Unsafe.SizeOf<T>();
+
+        ref readonly T value = ref MemoryMarshal.AsRef<T>(data[index..(index+=size)]);
+        return ref value;
+    }
 }
 
 internal ref struct DrawContext : IDisposable
@@ -64,9 +72,9 @@ internal ref struct DrawContext : IDisposable
 
 internal record struct Clear(Color Color)
 {
-    public static void Draw(Canvas canvas, ref ReadOnlySpan<byte> data)
+    public static void Draw(Canvas canvas, ref ReadOnlySpan<byte> data, ref int index)
     {
-        ref readonly Clear clear = ref MemoryMarshal.AsRef<Clear>(data);
+        ref readonly Clear clear = ref Primitives.GetStruct<Clear>(ref data, ref index);
 
         Colour color = Primitives.GetNvgColor(canvas, clear.Color);
 
@@ -77,9 +85,9 @@ internal record struct Clear(Color Color)
 
 internal record struct Line(Style Style, Point First, Point Second)
 {
-    public static void Draw(Canvas canvas, ref ReadOnlySpan<byte> data)
+    public static void Draw(Canvas canvas, ref ReadOnlySpan<byte> data, ref int index)
     {
-        ref readonly Line line = ref MemoryMarshal.AsRef<Line>(data);
+        ref readonly Line line = ref Primitives.GetStruct<Line>(ref data, ref index);
 
         if ((line.Style.Type | StyleType.Stroke) != StyleType.Stroke)
         {
@@ -102,9 +110,9 @@ internal record struct Line(Style Style, Point First, Point Second)
 
 internal record struct Rectangle(Style Style, Point TopLeft, Size Size)
 {
-    public static void Draw(Canvas canvas, ref ReadOnlySpan<byte> data)
+    public static void Draw(Canvas canvas, ref ReadOnlySpan<byte> data, ref int index)
     {
-        ref readonly Rectangle rect = ref MemoryMarshal.AsRef<Rectangle>(data);
+        ref readonly Rectangle rect = ref Primitives.GetStruct<Rectangle>(ref data, ref index);
 
         using DrawContext context = new DrawContext(canvas, rect.Style);
 
@@ -115,9 +123,9 @@ internal record struct Rectangle(Style Style, Point TopLeft, Size Size)
 
 internal record struct Circle(Style Style, Point Center, int Radius)
 {
-    public static void Draw(Canvas canvas, ref ReadOnlySpan<byte> data)
+    public static void Draw(Canvas canvas, ref ReadOnlySpan<byte> data, ref int index)
     {
-        ref readonly Circle circle = ref MemoryMarshal.AsRef<Circle>(data);
+        ref readonly Circle circle = ref Primitives.GetStruct<Circle>(ref data, ref index);
 
         using DrawContext context = new DrawContext(canvas, circle.Style);
 
@@ -128,9 +136,9 @@ internal record struct Circle(Style Style, Point Center, int Radius)
 
 internal record struct Ellipse(Style Style, Point Center, int RadiusX, int RadiusY)
 {
-    public static void Draw(Canvas canvas, ref ReadOnlySpan<byte> data)
+    public static void Draw(Canvas canvas, ref ReadOnlySpan<byte> data, ref int index)
     {
-        ref readonly Ellipse ellipse = ref MemoryMarshal.AsRef<Ellipse>(data);
+        ref readonly Ellipse ellipse = ref Primitives.GetStruct<Ellipse>(ref data, ref index);
 
         using DrawContext context = new DrawContext(canvas, ellipse.Style);
 
@@ -141,9 +149,9 @@ internal record struct Ellipse(Style Style, Point Center, int RadiusX, int Radiu
 
 internal record struct Bezier(Style Style, Point P0, Point P1, Point P2, Point P3)
 {
-    public static void Draw(Canvas canvas, ref ReadOnlySpan<byte> data)
+    public static void Draw(Canvas canvas, ref ReadOnlySpan<byte> data, ref int index)
     {
-        ref readonly Bezier bezier = ref MemoryMarshal.AsRef<Bezier>(data);
+        ref readonly Bezier bezier = ref Primitives.GetStruct<Bezier>(ref data, ref index);
 
         using DrawContext context = new DrawContext(canvas, bezier.Style);
 

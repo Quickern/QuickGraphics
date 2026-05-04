@@ -16,25 +16,30 @@ internal class PrimitivesDrawer(Canvas canvas)
 
     public void Enqueue<T>(byte id, T value) where T : unmanaged
     {
+        ReadOnlySpan<byte> additional = ReadOnlySpan<byte>.Empty;
+        Enqueue(id, value, ref additional);
+    }
+
+    public void Enqueue<T>(byte id, T value, ref readonly ReadOnlySpan<byte> additionalBytes) where T : unmanaged
+    {
         _queue.Add(id);
 
         ReadOnlySpan<byte> data = MemoryMarshal.AsBytes([ value ]);
         _queue.AddRange(data);
+        _queue.AddRange(additionalBytes);
     }
 
     public void Draw()
     {
-        ReadOnlySpan<byte> span = CollectionsMarshal.AsSpan(_queue);
-        for (int i = 0; i < span.Length;)
+        ReadOnlySpan<byte> data = CollectionsMarshal.AsSpan(_queue);
+        for (int i = 0; i < data.Length;)
         {
-            byte id = span[i];
+            byte id = data[i];
             i++;
 
-            (int size, Primitives.Handler draw) = Primitives.Handlers[id];
+            Primitives.Handler draw = Primitives.Handlers[id];
 
-            ReadOnlySpan<byte> data = span[i..(i+size)];
-            i += size;
-            draw(_canvas, ref data);
+            draw(_canvas, ref data, ref i);
         }
     }
 }
