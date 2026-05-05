@@ -6,6 +6,8 @@ namespace QuickGraphics;
 
 public partial class Canvas
 {
+    private FrameData _renderInfo;
+
     internal CanvasSynchronizationContext Context { get; }
 
     internal GL Gl { get => field ?? throw new InvalidOperationException("Gl called before initialization."); private set; }
@@ -21,7 +23,8 @@ public partial class Canvas
     public FrameAwaitable ForFrame => new FrameAwaitable(this);
 
     public Size Size { get; }
-    public virtual Size FramebufferSize { get; set; }
+    public int Width => Size.Width;
+    public int Height => Size.Height;
 
     public Canvas(CanvasSynchronizationContext context, Size size)
     {
@@ -33,22 +36,25 @@ public partial class Canvas
         Clear();
     }
 
-    public virtual void Run() { }
+    internal virtual void Run() { }
 
-    public void Load(GL gl)
+    internal void Load(GL gl)
     {
         Gl = gl;
 
-        OpenGLRenderer nvgRenderer = new(CreateFlags.StencilStrokes | CreateFlags.Debug, Gl);
+        OpenGLRenderer nvgRenderer = new OpenGLRenderer(CreateFlags.StencilStrokes | CreateFlags.Debug, Gl);
         Nvg = Nvg.Create(nvgRenderer);
     }
 
-    public void Render()
+    internal void Prepare(FrameData renderInfo)
     {
-        Context.Invoke();
+        _renderInfo = renderInfo;
+    }
 
+    internal void Render()
+    {
         Size winSize = Size;
-        Size fbSize = FramebufferSize;
+        Size fbSize = _renderInfo.FramebufferSize;
 
         double winAspect = (double)winSize.Width / winSize.Height;
         double fbAspect = (double)fbSize.Width / fbSize.Height;
@@ -65,6 +71,8 @@ public partial class Canvas
 
         float pxRatio = (float)finalSize.Width / winSize.Width;
 
+        Context.Invoke();
+
         Gl.Viewport((fbSize.Width - finalSize.Width) / 2, (fbSize.Height - finalSize.Height) / 2, (uint)finalSize.Width, (uint)finalSize.Height);
 
         Nvg.BeginFrame(winSize.Width, winSize.Height, pxRatio);
@@ -72,7 +80,7 @@ public partial class Canvas
         Nvg.EndFrame();
     }
 
-    public void Close()
+    internal void Close()
     {
         if (IsClosed)
         {
@@ -92,4 +100,6 @@ public partial class Canvas
     {
         Close();
     }
+
+    internal record struct FrameData(Size WindowSize, Size FramebufferSize);
 }

@@ -12,7 +12,7 @@
 	</ItemGroup>
 
   <ItemGroup>
-    <Compile Include="../../QuickGraphics/Globals.cs" Visible="False" />
+    <Compile Include="../../QuickGraphics/QgImplicitUsings.cs" Visible="False" />
   </ItemGroup>
 
 </Project>

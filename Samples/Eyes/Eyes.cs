@@ -5,8 +5,6 @@ await ForCanvas(640, 480);
 int w = 150, h = 100;
 int x = 320 - w / 2, y = 240 - h / 2;
 
-int mx = 320, my = 240;
-
 Stopwatch sw = Stopwatch.StartNew();
 sw.Restart();
 
@@ -31,6 +29,10 @@ while (IsNotClosed)
 
     Ellipse(Fill(220, 220, 220), (lx, ly), ex, ey);
     Ellipse(Fill(220, 220, 220), (rx, ry), ex, ey);
+
+    (int mx, int my) = Mouse.Position;
+
+    Circle(Red, (mx, my), 10);
 
     float dx = (mx - rx) / (ex * 10.0f);
     float dy = (my - ry) / (ey * 10.0f);

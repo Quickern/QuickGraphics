@@ -18,7 +18,8 @@ public class CanvasView(Canvas canvas) : OpenGlControlBase
     protected override void OnOpenGlRender(GlInterface gl, int fb)
     {
         double scale = TopLevel.GetTopLevel(this).RenderScaling;
-        _canvas.FramebufferSize = new Size((int)(Bounds.Width * scale), (int)(Bounds.Height * scale));
+
+        _canvas.Prepare(new Canvas.FrameData(new Size((int)Bounds.Width, (int)Bounds.Height), new Size((int)(Bounds.Width * scale), (int)(Bounds.Height * scale))));
 
         _canvas.Render();
 

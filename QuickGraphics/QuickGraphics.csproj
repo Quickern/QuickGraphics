@@ -19,11 +19,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Globals.cs" />
+    <Compile Remove="QgImplicitUsings.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Globals.cs" />
+    <EmbeddedResource Include="QgImplicitUsings.cs" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,6 @@
+using System.Numerics;
 using System.Reflection;
+using Silk.NET.Input;
 using Silk.NET.Maths;
 using Silk.NET.OpenGL;
 using Silk.NET.Windowing;
@@ -8,16 +10,7 @@ namespace QuickGraphics;
 public class WindowCanvas : Canvas
 {
     private readonly IWindow _window;
-
-    public override Size FramebufferSize
-    {
-        get
-        {
-            Vector2D<int> size = _window.FramebufferSize;
-            return new Size(size.X, size.Y);
-        }
-        set => throw new InvalidOperationException();
-    }
+    private IInputContext _input;
 
     public WindowCanvas(Size size) : base(SetupSynchronizationContext(), size)
     {
@@ -36,7 +29,7 @@ public class WindowCanvas : Canvas
         _window.Closing += OnClose;
     }
 
-    public override void Run()
+    internal override void Run()
     {
         if (!_window.IsInitialized)
         {
@@ -53,11 +46,24 @@ public class WindowCanvas : Canvas
 
     private void OnRender(double _DeltaTime)
     {
+        Vector2 mp = _input.Mice[0].Position;
+
+        mp.X *= (float)Size.Width / _window.Size.X;
+        mp.Y *= (float)Size.Height / _window.Size.Y;
+
+        Mouse = new MouseData(new Point((int)mp.X, (int)mp.Y));
+
+        Vector2D<int> winSize = _window.Size;
+        Vector2D<int> fbSize = _window.FramebufferSize;
+        Prepare(new FrameData(new Size(winSize.X, winSize.Y), new Size(fbSize.X, fbSize.Y)));
+
         Render();
     }
 
     private void OnLoad()
     {
+        _input = _window.CreateInput();
+
         Load(_window.CreateOpenGL());
     }
 
