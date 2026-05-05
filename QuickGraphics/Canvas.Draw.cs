@@ -1,3 +1,5 @@
+using QuickGraphics.Mathematics;
+
 namespace QuickGraphics;
 
 partial class Canvas

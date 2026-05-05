@@ -32,8 +32,6 @@ while (IsNotClosed)
 
     (int mx, int my) = Mouse.Position;
 
-    Circle(Red, (mx, my), 10);
-
     float dx = (mx - rx) / (ex * 10.0f);
     float dy = (my - ry) / (ey * 10.0f);
     float d = MathF.Sqrt(dx * dx + dy * dy);

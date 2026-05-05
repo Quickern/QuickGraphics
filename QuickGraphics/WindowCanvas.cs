@@ -1,5 +1,6 @@
 using System.Numerics;
 using System.Reflection;
+using QuickGraphics.Mathematics;
 using Silk.NET.Input;
 using Silk.NET.Maths;
 using Silk.NET.OpenGL;
@@ -48,10 +49,7 @@ public class WindowCanvas : Canvas
     {
         Vector2 mp = _input.Mice[0].Position;
 
-        mp.X *= (float)Size.Width / _window.Size.X;
-        mp.Y *= (float)Size.Height / _window.Size.Y;
-
-        Mouse = new MouseData(new Point((int)mp.X, (int)mp.Y));
+        PrepareMouse(new Point((int)mp.X, (int)mp.Y));
 
         Vector2D<int> winSize = _window.Size;
         Vector2D<int> fbSize = _window.FramebufferSize;

@@ -1,5 +1,6 @@
 using NvgNET;
 using NvgNET.Rendering.OpenGL;
+using QuickGraphics.Mathematics;
 using Silk.NET.OpenGL;
 
 namespace QuickGraphics;
@@ -53,29 +54,44 @@ public partial class Canvas
 
     internal void Render()
     {
-        Size winSize = Size;
+        Size canvasSize = Size;
+        Size winSize = _renderInfo.WindowSize;
         Size fbSize = _renderInfo.FramebufferSize;
 
-        double winAspect = (double)winSize.Width / winSize.Height;
+        double canvasAspect = (double)canvasSize.Width / canvasSize.Height;
         double fbAspect = (double)fbSize.Width / fbSize.Height;
 
         Size finalSize = fbSize;
-        if (winAspect > fbAspect)
+        if (canvasAspect > fbAspect)
         {
-            finalSize.Height = (int)(fbSize.Width / winAspect);
+            finalSize.Height = (int)(fbSize.Width / canvasAspect);
         }
-        else if (winAspect < fbAspect)
+        else if (canvasAspect < fbAspect)
         {
-            finalSize.Width = (int)(fbSize.Height * winAspect);
+            finalSize.Width = (int)(fbSize.Height * canvasAspect);
         }
 
-        float pxRatio = (float)finalSize.Width / winSize.Width;
+        float pxRatio = (float)finalSize.Width / canvasSize.Width;
+
+        (int X, int Y, uint Width, uint Height) viewPort = (
+            (fbSize.Width - finalSize.Width) / 2,
+            (fbSize.Height - finalSize.Height) / 2,
+            (uint)finalSize.Width,
+            (uint)finalSize.Height
+        );
+
+        (double X, double Y) mouseInFb = (
+            (double)_mousePosition.X * fbSize.Width / winSize.Width,
+            (double)_mousePosition.Y * fbSize.Height / winSize.Height);
+
+        Mouse = new MouseData(new Point((int)((mouseInFb.X - viewPort.X) / pxRatio),
+            (int)((mouseInFb.Y - viewPort.Y) / pxRatio)));
 
         Context.Invoke();
 
-        Gl.Viewport((fbSize.Width - finalSize.Width) / 2, (fbSize.Height - finalSize.Height) / 2, (uint)finalSize.Width, (uint)finalSize.Height);
+        Gl.Viewport(viewPort.X, viewPort.Y, viewPort.Width, viewPort.Height);
 
-        Nvg.BeginFrame(winSize.Width, winSize.Height, pxRatio);
+        Nvg.BeginFrame(canvasSize.Width, canvasSize.Height, pxRatio);
         _drawer.Draw();
         Nvg.EndFrame();
     }

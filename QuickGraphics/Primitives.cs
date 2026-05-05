@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using NvgNET;
 using NvgNET.Graphics;
 using NvgNET.Paths;
+using QuickGraphics.Mathematics;
 using Silk.NET.OpenGL;
 
 namespace QuickGraphics;

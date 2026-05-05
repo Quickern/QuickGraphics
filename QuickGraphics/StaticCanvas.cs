@@ -1,3 +1,5 @@
+using QuickGraphics.Mathematics;
+
 namespace QuickGraphics;
 
 public static class StaticCanvas
