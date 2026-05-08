@@ -3,7 +3,7 @@ using NvgNET.Rendering.OpenGL;
 using QuickGraphics.Mathematics;
 using Silk.NET.OpenGL;
 
-namespace QuickGraphics;
+namespace QuickGraphics.Drawing;
 
 public partial class Canvas
 {

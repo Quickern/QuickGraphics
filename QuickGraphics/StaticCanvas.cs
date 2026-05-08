@@ -1,3 +1,4 @@
+using QuickGraphics.Drawing;
 using QuickGraphics.Mathematics;
 
 namespace QuickGraphics;
@@ -12,10 +13,6 @@ public static class StaticCanvas
     public static bool IsNotClosed => !IsClosed;
 
     public static Canvas Canvas => s_canvas ?? throw new NoCanvasException($"Call `await {ForCanvas}(width, height);` before any draw.");
-
-    public static Size CanvasSize => Canvas.Size;
-    public static int CanvasWidth => Canvas.Width;
-    public static int CanvasHeight => Canvas.Height;
 
     public static FrameAwaitable ForFrame => Canvas.ForFrame;
     public static Task ForExit => Canvas.ForExit;

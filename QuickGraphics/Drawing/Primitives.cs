@@ -6,18 +6,18 @@ using NvgNET.Paths;
 using QuickGraphics.Mathematics;
 using Silk.NET.OpenGL;
 
-namespace QuickGraphics;
+namespace QuickGraphics.Drawing;
 
 internal static class Primitives
 {
     public static List<Handler> Handlers { get; } = [];
 
-    public static readonly byte Clear = Add<Clear>(QuickGraphics.Clear.Draw);
-    public static readonly byte Line = Add<Line>(QuickGraphics.Line.Draw);
-    public static readonly byte Rectangle = Add<Rectangle>(QuickGraphics.Rectangle.Draw);
-    public static readonly byte Circle = Add<Circle>(QuickGraphics.Circle.Draw);
-    public static readonly byte Ellipse = Add<Ellipse>(QuickGraphics.Ellipse.Draw);
-    public static readonly byte Bezier = Add<Bezier>(QuickGraphics.Bezier.Draw);
+    public static readonly byte Clear = Add<Clear>(Drawing.Clear.Draw);
+    public static readonly byte Line = Add<Line>(Drawing.Line.Draw);
+    public static readonly byte Rectangle = Add<Rectangle>(Drawing.Rectangle.Draw);
+    public static readonly byte Circle = Add<Circle>(Drawing.Circle.Draw);
+    public static readonly byte Ellipse = Add<Ellipse>(Drawing.Ellipse.Draw);
+    public static readonly byte Bezier = Add<Bezier>(Drawing.Bezier.Draw);
 
     public delegate void Handler(Canvas canvas, ref ReadOnlySpan<byte> data, ref int index);
 

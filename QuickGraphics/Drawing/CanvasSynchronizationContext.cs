@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
 using Frame = (System.Threading.SendOrPostCallback D, object? State);
 
-namespace QuickGraphics;
+namespace QuickGraphics.Drawing;
 
 public class CanvasSynchronizationContext : SynchronizationContext, IDisposable
 {

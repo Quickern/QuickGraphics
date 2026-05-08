@@ -6,7 +6,7 @@ using Silk.NET.Maths;
 using Silk.NET.OpenGL;
 using Silk.NET.Windowing;
 
-namespace QuickGraphics;
+namespace QuickGraphics.Drawing;
 
 public class WindowCanvas : Canvas
 {

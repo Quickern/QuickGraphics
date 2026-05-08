@@ -23,7 +23,14 @@ public class CanvasView(Canvas canvas) : OpenGlControlBase, ICustomHitTest
 
     protected override void OnOpenGlRender(GlInterface gl, int fb)
     {
-        double scale = TopLevel.GetTopLevel(this).RenderScaling;
+        TopLevel? topLevel = TopLevel.GetTopLevel(this);
+        if (topLevel == null)
+        {
+            // Something goes completely wrong.
+            return;
+        }
+
+        double scale = topLevel.RenderScaling;
 
         _canvas.PrepareMouse(new Point((int)_mousePosition.X, (int)_mousePosition.Y));
 

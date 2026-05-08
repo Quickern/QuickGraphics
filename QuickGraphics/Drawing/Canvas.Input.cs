@@ -1,6 +1,6 @@
 using QuickGraphics.Mathematics;
 
-namespace QuickGraphics;
+namespace QuickGraphics.Drawing;
 
 partial class Canvas
 {

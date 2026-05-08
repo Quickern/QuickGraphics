@@ -1,7 +1,6 @@
-using System.Buffers;
 using System.Runtime.InteropServices;
 
-namespace QuickGraphics;
+namespace QuickGraphics.Drawing;
 
 internal class PrimitivesDrawer(Canvas canvas)
 {
