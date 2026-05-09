@@ -2,25 +2,25 @@
 
 await ForCanvas(640, 480);
 
-int w = 150, h = 100;
-int x = 320 - w / 2, y = 240 - h / 2;
+Number w = 150, h = 100;
+Number x = 320 - w / 2, y = 240 - h / 2;
 
 Stopwatch sw = Stopwatch.StartNew();
 sw.Restart();
 
-int ex = (int)(w * 0.23f);
-int ey = (int)(h * 0.5f);
-int lx = x + ex;
-int ly = y + ey;
-int rx = x + w - ex;
-int ry = y + ey;
-int br = (int)(Math.Min(ex, ey) * 0.5f);
+Number ex = w * 0.23f;
+Number ey = h * 0.5f;
+Number lx = x + ex;
+Number ly = y + ey;
+Number rx = x + w - ex;
+Number ry = y + ey;
+Number br = MathF.Min(ex, ey) * 0.5f;
 
 while (IsNotClosed)
 {
-    float t = (float)sw.Elapsed.TotalSeconds;
+    Number t = sw.Elapsed.TotalSeconds;
 
-    float blink = 1.0f - MathF.Pow(MathF.Sin(t * 0.5f), 200.0f) * 0.8f - 0.000001f;
+    Number blink = 1.0f - MathF.Pow(MathF.Sin(t * 0.5f), 200.0f) * 0.8f;
 
     Clear((76, 76, 76, 255));
 
@@ -30,7 +30,7 @@ while (IsNotClosed)
     Ellipse(Fill(220, 220, 220), (lx, ly), ex, ey);
     Ellipse(Fill(220, 220, 220), (rx, ry), ex, ey);
 
-    (int mx, int my) = Mouse.Position;
+    (Number mx, Number my) = Mouse.Position;
 
     Circle(Red, (mx, my), 10);
 
@@ -45,7 +45,7 @@ while (IsNotClosed)
     dx *= ex * 0.4f;
     dy *= ey * 0.5f;
 
-    Ellipse(Fill(32, 32, 32), ((int)(lx + dx), (int)(ly + dy + ey * 0.25f * (1.0f - blink))), (int)br, (int)(br * blink));
+    Ellipse(Fill(32, 32, 32), (lx + dx, ly + dy + ey * 0.25f * (1.0f - blink)), br, br * blink);
 
     dx = (mx - rx) / (ex * 10.0f);
     dy = (my - ry) / (ey * 10.0f);
@@ -58,7 +58,7 @@ while (IsNotClosed)
     dx *= ex * 0.4f;
     dy *= ey * 0.5f;
 
-    Ellipse(Fill(32, 32, 32), ((int)(rx + dx), (int)(ry + dy + ey * 0.25f * (1.0f - blink))), (int)br, (int)(br * blink));
+    Ellipse(Fill(32, 32, 32), (rx + dx, ry + dy + ey * 0.25f * (1.0f - blink)), br, br * blink);
 
     await ForFrame;
 }

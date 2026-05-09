@@ -64,13 +64,13 @@ internal ref struct DrawContext : IDisposable
             _canvas.Nvg.StrokeColour(Primitives.GetNvgColor(_canvas, _style.Paint.Color));
             _canvas.Nvg.StrokeWidth(_style.StrokeWidth);
         }
-        if ((_style.Type & StyleType.Fill) == StyleType.Fill)
+        if ((_style.Type & StyleType.OnlyFill) == StyleType.OnlyFill)
             _canvas.Nvg.FillColour(Primitives.GetNvgColor(_canvas, _style.Paint.Color));
     }
 
     public void Dispose()
     {
-        if ((_style.Type & StyleType.Fill) == StyleType.Fill)
+        if ((_style.Type & StyleType.OnlyFill) == StyleType.OnlyFill)
             _canvas.Nvg.Fill();
         if ((_style.Type & StyleType.Stroke) == StyleType.Stroke)
             _canvas.Nvg.Stroke();
@@ -125,7 +125,7 @@ internal record struct Rectangle(Style Style, Point TopLeft, Size Size)
     }
 }
 
-internal record struct Circle(Style Style, Point Center, int Radius)
+internal record struct Circle(Style Style, Point Center, Number Radius)
 {
     public static void Draw(Canvas canvas, ref ReadOnlySpan<byte> data, ref int index)
     {
@@ -138,7 +138,7 @@ internal record struct Circle(Style Style, Point Center, int Radius)
     }
 }
 
-internal record struct Ellipse(Style Style, Point Center, int RadiusX, int RadiusY)
+internal record struct Ellipse(Style Style, Point Center, Number RadiusX, Number RadiusY)
 {
     public static void Draw(Canvas canvas, ref ReadOnlySpan<byte> data, ref int index)
     {
