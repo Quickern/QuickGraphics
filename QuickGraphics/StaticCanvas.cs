@@ -17,6 +17,10 @@ public static class StaticCanvas
     public static FrameAwaitable ForFrame => Canvas.ForFrame;
     public static Task ForExit => Canvas.ForExit;
 
+    public static TimeSpan Time => Canvas.Time;
+    public static Number TimeSeconds => Canvas.TimeSeconds;
+    public static Number FrameTime => Canvas.FrameTime;
+
     public static CanvasRunAwaitable ForCanvas(Number width, Number height)
     {
         s_canvas = CanvasResolver(new Size(width, height));

@@ -1,6 +1,6 @@
 global using QuickGraphics;
 global using QuickGraphics.Mathematics;
-global using static QuickGraphics.Mathematics.Constants;
+global using static QuickGraphics.Mathematics.QgMath;
 global using static QuickGraphics.StaticCanvas;
 global using static QuickGraphics.StaticConsole;
 global using static QuickGraphics.Colors;

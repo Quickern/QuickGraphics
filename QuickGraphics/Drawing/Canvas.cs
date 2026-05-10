@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using NvgNET;
 using NvgNET.Rendering.OpenGL;
 using QuickGraphics.Mathematics;
@@ -8,6 +9,8 @@ namespace QuickGraphics.Drawing;
 public partial class Canvas
 {
     private FrameData _renderInfo;
+
+    private readonly Stopwatch _time = Stopwatch.StartNew();
 
     internal CanvasSynchronizationContext Context { get; }
 
@@ -22,6 +25,10 @@ public partial class Canvas
     public Task ForExit => _tcs.Task;
 
     public FrameAwaitable ForFrame => new FrameAwaitable(this);
+
+    public TimeSpan Time { get; private set; }
+    public Number TimeSeconds { get; private set; }
+    public Number FrameTime { get; private set; }
 
     public Size Size { get; }
     public int Width => Size.Width;
@@ -86,6 +93,11 @@ public partial class Canvas
 
         Mouse = new MouseData(new Point((int)((mouseInFb.X - viewPort.X) / pxRatio),
             (int)((mouseInFb.Y - viewPort.Y) / pxRatio)));
+
+        TimeSpan prevTime = Time;
+        Time = _time.Elapsed;
+        TimeSeconds = Time.TotalSeconds;
+        FrameTime = (Time - prevTime).TotalSeconds;
 
         Context.Invoke();
 

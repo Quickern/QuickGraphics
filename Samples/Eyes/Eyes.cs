@@ -1,26 +1,21 @@
-﻿using System.Diagnostics;
-
-await ForCanvas(640, 480);
+﻿await ForCanvas(640, 480);
 
 Number w = 150, h = 100;
 Number x = 320 - w / 2, y = 240 - h / 2;
 
-Stopwatch sw = Stopwatch.StartNew();
-sw.Restart();
-
-Number ex = w * 0.23f;
-Number ey = h * 0.5f;
+Number ex = w * 0.23;
+Number ey = h * 0.5;
 Number lx = x + ex;
 Number ly = y + ey;
 Number rx = x + w - ex;
 Number ry = y + ey;
-Number br = MathF.Min(ex, ey) * 0.5f;
+Number br = Min(ex, ey) * 0.5;
 
 while (IsNotClosed)
 {
-    Number t = sw.Elapsed.TotalSeconds;
+    Number t = TimeSeconds;
 
-    Number blink = 1.0f - MathF.Pow(MathF.Sin(t * 0.5f), 200.0f) * 0.8f;
+    Number blink = 1.0f - Pow(Sin(t * 0.5), 200.0) * 0.8;
 
     Clear((76, 76, 76, 255));
 
@@ -34,10 +29,10 @@ while (IsNotClosed)
 
     Circle(Red, (mx, my), 10);
 
-    float dx = (mx - rx) / (ex * 10.0f);
-    float dy = (my - ry) / (ey * 10.0f);
-    float d = MathF.Sqrt(dx * dx + dy * dy);
-    if (d > 1.0f)
+    float dx = (mx - rx) / (ex * 10.0);
+    float dy = (my - ry) / (ey * 10.0);
+    float d = Sqrt(dx * dx + dy * dy);
+    if (d > 1.0)
     {
         dx /= d;
         dy /= d;
@@ -45,20 +40,20 @@ while (IsNotClosed)
     dx *= ex * 0.4f;
     dy *= ey * 0.5f;
 
-    Ellipse(Fill(32, 32, 32), (lx + dx, ly + dy + ey * 0.25f * (1.0f - blink)), br, br * blink);
+    Ellipse(Fill(32, 32, 32), (lx + dx, ly + dy + ey * 0.25 * (1.0 - blink)), br, br * blink);
 
-    dx = (mx - rx) / (ex * 10.0f);
-    dy = (my - ry) / (ey * 10.0f);
-    d = MathF.Sqrt(dx * dx + dy * dy);
-    if (d > 1.0f)
+    dx = (mx - rx) / (ex * 10.0);
+    dy = (my - ry) / (ey * 10.0);
+    d = Sqrt(dx * dx + dy * dy);
+    if (d > 1.0)
     {
         dx /= d;
         dy /= d;
     }
-    dx *= ex * 0.4f;
-    dy *= ey * 0.5f;
+    dx *= ex * 0.4;
+    dy *= ey * 0.5;
 
-    Ellipse(Fill(32, 32, 32), (rx + dx, ry + dy + ey * 0.25f * (1.0f - blink)), br, br * blink);
+    Ellipse(Fill(32, 32, 32), (rx + dx, ry + dy + ey * 0.25 * (1.0 - blink)), br, br * blink);
 
     await ForFrame;
 }
