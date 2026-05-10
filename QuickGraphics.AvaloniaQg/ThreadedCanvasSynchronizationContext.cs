@@ -1,4 +1,4 @@
-namespace QuickGraphics.Avalonia.Common;
+namespace QuickGraphics.AvaloniaQg;
 
 public class ThreadedCanvasSynchronizationContext : CanvasSynchronizationContext
 {

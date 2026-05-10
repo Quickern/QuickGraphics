@@ -1,3 +1,3 @@
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("QuickGraphics.Avalonia.Common")]
+[assembly: InternalsVisibleTo("QuickGraphics.AvaloniaQg")]

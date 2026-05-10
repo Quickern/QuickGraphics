@@ -15,6 +15,7 @@
     <Project Path="Nvg.NET/src/rendering/Nvg.Rendering.OpenGL/Nvg.Rendering.OpenGL.csproj" />
     <Project Path="Nvg.NET/src/rendering/Nvg.Rendering/Nvg.Rendering.csproj" />
   </Folder>
+  <Project Path="QuickGraphics.AvaloniaQg/QuickGraphics.AvaloniaQg.csproj" />
   <Project Path="QuickGraphics.Tests/QuickGraphics.Tests.csproj" />
 
   <Project Path="QuickGraphics/QuickGraphics.csproj" />

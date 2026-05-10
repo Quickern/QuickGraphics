@@ -4,15 +4,15 @@ using Avalonia.OpenGL.Controls;
 using Avalonia.Rendering;
 using Silk.NET.OpenGL;
 
-namespace QuickGraphics.Avalonia.Common;
+namespace QuickGraphics.AvaloniaQg;
 
 public class CanvasView(Canvas canvas) : OpenGlControlBase, ICustomHitTest
 {
     private readonly Canvas _canvas = canvas;
 
-    private global::Avalonia.Point _mousePosition;
+    private Avalonia.Point _mousePosition;
 
-    public bool HitTest(global::Avalonia.Point point) => Bounds.Contains(point);
+    public bool HitTest(Avalonia.Point point) => Bounds.Contains(point);
 
     protected override void OnOpenGlInit(GlInterface gl)
     {
@@ -32,18 +32,18 @@ public class CanvasView(Canvas canvas) : OpenGlControlBase, ICustomHitTest
 
         double scale = topLevel.RenderScaling;
 
-        _canvas.PrepareMouse(new Point((int)_mousePosition.X, (int)_mousePosition.Y));
+        _canvas.PrepareMouse(new Point(_mousePosition.X, _mousePosition.Y));
 
-        _canvas.Prepare(new Canvas.FrameData(new Size((int)Bounds.Width, (int)Bounds.Height), new Size((int)(Bounds.Width * scale), (int)(Bounds.Height * scale))));
+        _canvas.Prepare(new Canvas.FrameData(new Size(Bounds.Width, Bounds.Height), new Size(Bounds.Width * scale, Bounds.Height * scale)));
 
         _canvas.Render();
 
         RequestNextFrameRendering();
     }
 
-    protected override global::Avalonia.Size MeasureOverride(global::Avalonia.Size availableSize)
+    protected override Avalonia.Size MeasureOverride(Avalonia.Size availableSize)
     {
-        global::Avalonia.Size canvasSize = new global::Avalonia.Size(_canvas.Size.Width, _canvas.Size.Height);
+        Avalonia.Size canvasSize = new Avalonia.Size(_canvas.Size.Width, _canvas.Size.Height);
 
         (double width, double height) = availableSize;
 
@@ -56,7 +56,7 @@ public class CanvasView(Canvas canvas) : OpenGlControlBase, ICustomHitTest
             width = availableSize.Height * canvasSize.AspectRatio;
         }
 
-        return new global::Avalonia.Size(width, height);
+        return new Avalonia.Size(width, height);
     }
 
     protected override void OnPointerMoved(PointerEventArgs e)

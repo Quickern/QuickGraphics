@@ -1,6 +1,6 @@
 using Avalonia.Threading;
 
-namespace QuickGraphics.Avalonia.Common;
+namespace QuickGraphics.AvaloniaQg;
 
 public class QgAvaloniaProgram
 {

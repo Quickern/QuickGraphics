@@ -1,4 +1,4 @@
-namespace QuickGraphics.Avalonia.Common;
+namespace QuickGraphics.AvaloniaQg;
 
 public class QgProgram(Action program, QgProgram.PrintHandler? printHandler)
 {
@@ -32,10 +32,10 @@ public class QgProgram(Action program, QgProgram.PrintHandler? printHandler)
 
         if (_printHandler != null)
         {
-            StaticConsole.LogResolver = Print;
+            QgConsole.LogResolver = Print;
         }
 
-        StaticCanvas.CanvasResolver = CreateCanvas;
+        QgCanvas.CanvasResolver = CreateCanvas;
 
         _program();
 
@@ -65,7 +65,7 @@ public class QgProgram(Action program, QgProgram.PrintHandler? printHandler)
         return canvas;
     }
 
-    private void Print(string message)
+    private void Print(QgConsole.LogType type, string message)
     {
         _printHandler?.Invoke(message);
         Console.WriteLine($"[Canvas] {message}");

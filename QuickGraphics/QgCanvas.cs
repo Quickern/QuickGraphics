@@ -3,7 +3,7 @@ using QuickGraphics.Mathematics;
 
 namespace QuickGraphics;
 
-public static class StaticCanvas
+public static class QgCanvas
 {
     internal static Func<Size, Canvas> CanvasResolver { get; set; } = size => new WindowCanvas(size);
 

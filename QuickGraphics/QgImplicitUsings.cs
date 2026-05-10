@@ -1,8 +1,8 @@
 global using QuickGraphics;
 global using QuickGraphics.Mathematics;
 global using static QuickGraphics.Mathematics.QgMath;
-global using static QuickGraphics.StaticCanvas;
-global using static QuickGraphics.StaticConsole;
+global using static QuickGraphics.QgCanvas;
+global using static QuickGraphics.QgConsole;
 global using static QuickGraphics.Colors;
 global using static QuickGraphics.Style;
 // global using Key = Silk.NET.Input.Key;
