@@ -1,0 +1,22 @@
+<Project>
+
+  <PropertyGroup>
+    <PublishSingleFile>true</PublishSingleFile>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Silk.NET.Windowing" Version="2.22.0" />
+		<PackageReference Include="Silk.NET.Input" Version="2.22.0" />
+		<PackageReference Include="Silk.NET.OpenGL" Version="2.22.0" />
+		<PackageReference Include="StbImageWriteSharp" Version="1.16.7" />
+	</ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="/Users/user/Projects/Pipopolam/QuickGraphics.Ide/QuickGraphics/Samples/Eyes/bin/Debug/net10.0/QuickGraphics.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="/Users/user/Projects/Pipopolam/QuickGraphics.Ide/QuickGraphics/QuickGraphics/QgImplicitUsings.cs" Visible="False" />
+  </ItemGroup>
+
+</Project>

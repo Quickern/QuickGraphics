@@ -2,9 +2,11 @@ using System.Numerics;
 using System.Reflection;
 using QuickGraphics.Mathematics;
 using Silk.NET.Input;
+using Silk.NET.Input.Glfw;
 using Silk.NET.Maths;
 using Silk.NET.OpenGL;
 using Silk.NET.Windowing;
+using Silk.NET.Windowing.Glfw;
 
 namespace QuickGraphics.Drawing;
 
@@ -15,6 +17,9 @@ public class WindowCanvas : Canvas
 
     public WindowCanvas(Size size) : base(SetupSynchronizationContext(), size)
     {
+        GlfwWindowing.Use();
+        GlfwInput.RegisterPlatform();
+
         WindowOptions windowOptions = WindowOptions.Default;
         windowOptions.FramesPerSecond = 60;
         windowOptions.ShouldSwapAutomatically = true;
