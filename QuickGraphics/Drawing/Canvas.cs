@@ -1,23 +1,29 @@
 using System.Diagnostics;
 using NvgNET;
 using NvgNET.Rendering.OpenGL;
+using QuickGraphics.Drawing.Input;
 using QuickGraphics.Mathematics;
 using Silk.NET.OpenGL;
+using Rect = (int X, int Y, uint Width, uint Height, float PxRatio);
 
 namespace QuickGraphics.Drawing;
 
 public partial class Canvas
 {
-    private FrameData _renderInfo;
-
     private readonly Stopwatch _time = Stopwatch.StartNew();
+
+    private readonly PrimitivesDrawer _drawer;
 
     internal CanvasSynchronizationContext Context { get; }
 
     internal GL Gl { get => field ?? throw new InvalidOperationException("Gl called before initialization."); private set; }
     internal Nvg Nvg { get => field ?? throw new InvalidOperationException("NVG called before initialization."); private set; }
 
-    private readonly PrimitivesDrawer _drawer;
+    internal Rect ViewPort { get; private set; }
+
+    private readonly MouseHandler _mouseHandler;
+    internal MouseHandler MouseHandler => _mouseHandler;
+    public IMouse Mouse => _mouseHandler;
 
     public bool IsClosed { get; private set; }
 
@@ -40,6 +46,7 @@ public partial class Canvas
         Size = size;
 
         _drawer = new PrimitivesDrawer(this);
+        _mouseHandler = new MouseHandler(this);
 
         Clear();
     }
@@ -54,16 +61,11 @@ public partial class Canvas
         Nvg = Nvg.Create(nvgRenderer);
     }
 
-    internal void Prepare(FrameData renderInfo)
-    {
-        _renderInfo = renderInfo;
-    }
-
-    internal void Render()
+    internal void Render(FrameData renderInfo)
     {
         Size canvasSize = Size;
-        Size winSize = _renderInfo.WindowSize;
-        Size fbSize = _renderInfo.FramebufferSize;
+        Size winSize = renderInfo.WindowSize;
+        Size fbSize = renderInfo.FramebufferSize;
 
         double canvasAspect = (double)canvasSize.Width / canvasSize.Height;
         double fbAspect = (double)fbSize.Width / fbSize.Height;
@@ -78,21 +80,15 @@ public partial class Canvas
             finalSize.Width = (int)(fbSize.Height * canvasAspect);
         }
 
-        float pxRatio = (float)finalSize.Width / canvasSize.Width;
-
-        (int X, int Y, uint Width, uint Height) viewPort = (
+        ViewPort = (
             (fbSize.Width - finalSize.Width) / 2,
             (fbSize.Height - finalSize.Height) / 2,
             (uint)finalSize.Width,
-            (uint)finalSize.Height
+            (uint)finalSize.Height,
+            (float)finalSize.Width / canvasSize.Width
         );
 
-        (double X, double Y) mouseInFb = (
-            (double)_mousePosition.X * fbSize.Width / winSize.Width,
-            (double)_mousePosition.Y * fbSize.Height / winSize.Height);
-
-        Mouse = new MouseData(new Point((int)((mouseInFb.X - viewPort.X) / pxRatio),
-            (int)((mouseInFb.Y - viewPort.Y) / pxRatio)));
+        using MouseHandler.UpdateContext mouseCtx = _mouseHandler.BeginUpdate(renderInfo);
 
         TimeSpan prevTime = Time;
         Time = _time.Elapsed;
@@ -101,9 +97,9 @@ public partial class Canvas
 
         Context.Invoke();
 
-        Gl.Viewport(viewPort.X, viewPort.Y, viewPort.Width, viewPort.Height);
+        Gl.Viewport(ViewPort.X, ViewPort.Y, ViewPort.Width, ViewPort.Height);
 
-        Nvg.BeginFrame(canvasSize.Width, canvasSize.Height, pxRatio);
+        Nvg.BeginFrame(canvasSize.Width, canvasSize.Height, ViewPort.PxRatio);
         _drawer.Draw();
         Nvg.EndFrame();
     }

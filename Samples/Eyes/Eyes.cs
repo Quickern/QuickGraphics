@@ -27,7 +27,12 @@ while (IsNotClosed)
 
     (Number mx, Number my) = Mouse.Position;
 
-    Circle(Red, (mx, my), 10);
+    if (Mouse.IsPressed(MouseButton.Left))
+        Circle(Fill(Blue), (mx, my), 10);
+    else if (Mouse.IsPressed(MouseButton.Right))
+        Circle(Fill(Green), (mx, my), 10);
+    else
+        Circle(Red, (mx, my), 10);
 
     float dx = (mx - rx) / (ex * 10.0);
     float dy = (my - ry) / (ey * 10.0);

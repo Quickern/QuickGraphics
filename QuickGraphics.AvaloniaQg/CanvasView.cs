@@ -10,8 +10,6 @@ public class CanvasView(Canvas canvas) : OpenGlControlBase, ICustomHitTest
 {
     private readonly Canvas _canvas = canvas;
 
-    private Avalonia.Point _mousePosition;
-
     public bool HitTest(Avalonia.Point point) => Bounds.Contains(point);
 
     protected override void OnOpenGlInit(GlInterface gl)
@@ -32,11 +30,7 @@ public class CanvasView(Canvas canvas) : OpenGlControlBase, ICustomHitTest
 
         double scale = topLevel.RenderScaling;
 
-        _canvas.PrepareMouse(new Point(_mousePosition.X, _mousePosition.Y));
-
-        _canvas.Prepare(new Canvas.FrameData(new Size(Bounds.Width, Bounds.Height), new Size(Bounds.Width * scale, Bounds.Height * scale)));
-
-        _canvas.Render();
+        _canvas.Render(new Canvas.FrameData(new Size(Bounds.Width, Bounds.Height), new Size(Bounds.Width * scale, Bounds.Height * scale)));
 
         RequestNextFrameRendering();
     }
@@ -59,11 +53,46 @@ public class CanvasView(Canvas canvas) : OpenGlControlBase, ICustomHitTest
         return new Avalonia.Size(width, height);
     }
 
+    protected override void OnPointerPressed(PointerPressedEventArgs e)
+    {
+        base.OnPointerPressed(e);
+
+        PointerUpdateKind kind = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
+
+        _canvas.MouseHandler.Press(kind switch
+        {
+            PointerUpdateKind.LeftButtonPressed => Silk.NET.Input.MouseButton.Left,
+            PointerUpdateKind.RightButtonPressed => Silk.NET.Input.MouseButton.Right,
+            PointerUpdateKind.MiddleButtonPressed => Silk.NET.Input.MouseButton.Middle,
+            PointerUpdateKind.XButton1Pressed => Silk.NET.Input.MouseButton.Button4,
+            PointerUpdateKind.XButton2Pressed => Silk.NET.Input.MouseButton.Button5,
+            _ => Silk.NET.Input.MouseButton.Unknown
+        });
+    }
+
     protected override void OnPointerMoved(PointerEventArgs e)
     {
         base.OnPointerMoved(e);
 
-        _mousePosition = e.GetPosition(this);
+        Avalonia.Point pos = e.GetPosition(this);
+        _canvas.MouseHandler.SetRawPosition(new Point(pos.X, pos.Y));
+    }
+
+    protected override void OnPointerReleased(PointerReleasedEventArgs e)
+    {
+        base.OnPointerReleased(e);
+
+        PointerUpdateKind kind = e.GetCurrentPoint(this).Properties.PointerUpdateKind;
+
+        _canvas.MouseHandler.Release(kind switch
+        {
+            PointerUpdateKind.LeftButtonReleased => Silk.NET.Input.MouseButton.Left,
+            PointerUpdateKind.RightButtonReleased => Silk.NET.Input.MouseButton.Right,
+            PointerUpdateKind.MiddleButtonReleased => Silk.NET.Input.MouseButton.Middle,
+            PointerUpdateKind.XButton1Released => Silk.NET.Input.MouseButton.Button4,
+            PointerUpdateKind.XButton2Released => Silk.NET.Input.MouseButton.Button5,
+            _ => Silk.NET.Input.MouseButton.Unknown
+        });
     }
 
     protected override void OnOpenGlDeinit(GlInterface gl)

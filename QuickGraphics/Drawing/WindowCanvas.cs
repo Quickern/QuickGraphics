@@ -11,7 +11,9 @@ namespace QuickGraphics.Drawing;
 public class WindowCanvas : Canvas
 {
     private readonly IWindow _window;
-    private IInputContext _input;
+
+    private IInputContext? _input;
+    private IInputContext Input => _input ?? throw new NoCanvasException();
 
     public WindowCanvas(Size size) : base(SetupSynchronizationContext(), size)
     {
@@ -45,25 +47,36 @@ public class WindowCanvas : Canvas
         return context;
     }
 
-    private void OnRender(double _DeltaTime)
-    {
-        Vector2 mp = _input.Mice[0].Position;
-
-        PrepareMouse(new Point((int)mp.X, (int)mp.Y));
-
-        Vector2D<int> winSize = _window.Size;
-        Vector2D<int> fbSize = _window.FramebufferSize;
-        Prepare(new FrameData(new Size(winSize.X, winSize.Y), new Size(fbSize.X, fbSize.Y)));
-
-        Render();
-    }
-
     private void OnLoad()
     {
         _input = _window.CreateInput();
 
+        foreach (IMouse mouse in _input.Mice)
+        {
+            mouse.MouseDown += OnMouseDown;
+            mouse.MouseMove += OnMouseMove;
+            mouse.MouseUp += OnMouseUp;
+        }
+
+        if (_input.Mice.Any())
+        {
+            MouseHandler.SetRawPosition(Point.FromNumerics(_input.Mice[0].Position));
+        }
+
         Load(_window.CreateOpenGL());
     }
+
+    private void OnRender(double _DeltaTime)
+    {
+        Vector2D<int> winSize = _window.Size;
+        Vector2D<int> fbSize = _window.FramebufferSize;
+
+        Render(new FrameData(new Size(winSize.X, winSize.Y), new Size(fbSize.X, fbSize.Y)));
+    }
+
+    void OnMouseDown(IMouse mouse, MouseButton mouseButton) => MouseHandler.Press(mouseButton);
+    void OnMouseMove(IMouse mouse, Vector2 position) => MouseHandler.SetRawPosition(Point.FromNumerics(position));
+    void OnMouseUp(IMouse mouse, MouseButton mouseButton) => MouseHandler.Release(mouseButton);
 
     private void OnClose()
     {

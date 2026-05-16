@@ -1,4 +1,5 @@
 using QuickGraphics.Drawing;
+using QuickGraphics.Drawing.Input;
 using QuickGraphics.Mathematics;
 
 namespace QuickGraphics;
@@ -28,7 +29,7 @@ public static class QgCanvas
         return new CanvasRunAwaitable(s_canvas);
     }
 
-    public static MouseData Mouse => Canvas.Mouse;
+    public static IMouse Mouse => Canvas.Mouse;
 
     public static void Clear() => Canvas.Clear();
     public static void Clear(Color color) => Canvas.Clear(color);

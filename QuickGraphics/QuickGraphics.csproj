@@ -26,4 +26,8 @@
     <EmbeddedResource Include="QgImplicitUsings.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Drawing/Input/" />
+  </ItemGroup>
+
 </Project>
