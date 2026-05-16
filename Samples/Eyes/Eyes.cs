@@ -1,4 +1,6 @@
-﻿await ForCanvas(640, 480);
+﻿using System.Text;
+
+await ForCanvas(640, 480);
 
 Number w = 150, h = 100;
 Number x = 320 - w / 2, y = 240 - h / 2;
@@ -10,6 +12,8 @@ Number ly = y + ey;
 Number rx = x + w - ex;
 Number ry = y + ey;
 Number br = Min(ex, ey) * 0.5;
+
+StringBuilder sb = new StringBuilder();
 
 while (IsNotClosed)
 {
@@ -26,13 +30,6 @@ while (IsNotClosed)
     Ellipse(Fill(220, 220, 220), (rx, ry), ex, ey);
 
     (Number mx, Number my) = Mouse.Position;
-
-    if (Mouse.IsPressed(MouseButton.Left))
-        Circle(Fill(Blue), (mx, my), 10);
-    else if (Mouse.IsPressed(MouseButton.Right))
-        Circle(Fill(Green), (mx, my), 10);
-    else
-        Circle(Red, (mx, my), 10);
 
     float dx = (mx - rx) / (ex * 10.0);
     float dy = (my - ry) / (ey * 10.0);
@@ -59,6 +56,21 @@ while (IsNotClosed)
     dy *= ey * 0.5;
 
     Ellipse(Fill(32, 32, 32), (rx + dx, ry + dy + ey * 0.25 * (1.0 - blink)), br, br * blink);
+
+    if (Mouse.IsPressed(MouseButton.Left))
+        Circle(Fill(Blue), (mx, my), 10);
+    else if (Mouse.IsPressed(MouseButton.Right))
+        Circle(Fill(Green), (mx, my), 10);
+    else if (Keyboard.IsPressed(Key.ControlLeft))
+        Circle(Cyan, (mx, my), 10);
+    else
+        Circle(Red, (mx, my), 10);
+
+    if (!Keyboard.TextSpan.IsEmpty)
+    {
+        sb.Append(Keyboard.TextSpan);
+        Print(sb.ToString());
+    }
 
     await ForFrame;
 }

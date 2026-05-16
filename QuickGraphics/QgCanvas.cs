@@ -30,6 +30,7 @@ public static class QgCanvas
     }
 
     public static IMouse Mouse => Canvas.Mouse;
+    public static IKeyboard Keyboard => Canvas.Keyboard;
 
     public static void Clear() => Canvas.Clear();
     public static void Clear(Color color) => Canvas.Clear(color);

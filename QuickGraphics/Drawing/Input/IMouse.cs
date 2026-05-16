@@ -7,9 +7,8 @@ public interface IMouse
 {
     Point Position { get; }
 
-
     bool IsPressed(MouseButton mouseButton);
 
     bool WasPressedDown(MouseButton mouseButton);
-    bool WasRelease(MouseButton mouseButton);
+    bool WasReleased(MouseButton mouseButton);
 }

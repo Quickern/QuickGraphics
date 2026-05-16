@@ -17,7 +17,7 @@ internal class MouseHandler(Canvas canvas) : IMouse
 
     public bool IsPressed(MouseButton mouseButton) => _pressed.Contains(mouseButton);
     public bool WasPressedDown(MouseButton mouseButton) => _down.Contains(mouseButton);
-    public bool WasRelease(MouseButton mouseButton) => _up.Contains(mouseButton);
+    public bool WasReleased(MouseButton mouseButton) => _up.Contains(mouseButton);
 
     public UpdateContext BeginUpdate(Canvas.FrameData renderInfo)
     {

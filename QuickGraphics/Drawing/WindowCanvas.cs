@@ -63,6 +63,13 @@ public class WindowCanvas : Canvas
             MouseHandler.SetRawPosition(Point.FromNumerics(_input.Mice[0].Position));
         }
 
+        foreach (IKeyboard keyboard in _input.Keyboards)
+        {
+            keyboard.KeyDown += OnKeyDown;
+            keyboard.KeyChar += OnKeyChar;
+            keyboard.KeyUp += OnKeyUp;
+        }
+
         Load(_window.CreateOpenGL());
     }
 
@@ -77,6 +84,10 @@ public class WindowCanvas : Canvas
     void OnMouseDown(IMouse mouse, MouseButton mouseButton) => MouseHandler.Press(mouseButton);
     void OnMouseMove(IMouse mouse, Vector2 position) => MouseHandler.SetRawPosition(Point.FromNumerics(position));
     void OnMouseUp(IMouse mouse, MouseButton mouseButton) => MouseHandler.Release(mouseButton);
+
+    void OnKeyDown(IKeyboard keyboard, Key key, int i) => KeyboardHandler.Press(key);
+    void OnKeyChar(IKeyboard keyboard, char c) => KeyboardHandler.AddChar(c);
+    void OnKeyUp(IKeyboard keyboard, Key key, int i) => KeyboardHandler.Release(key);
 
     private void OnClose()
     {

@@ -25,6 +25,10 @@ public partial class Canvas
     internal MouseHandler MouseHandler => _mouseHandler;
     public IMouse Mouse => _mouseHandler;
 
+    private readonly KeyboardHandler _keyboardHandler;
+    internal KeyboardHandler KeyboardHandler => _keyboardHandler;
+    public IKeyboard Keyboard => _keyboardHandler;
+
     public bool IsClosed { get; private set; }
 
     private readonly TaskCompletionSource _tcs = new TaskCompletionSource();
@@ -47,6 +51,7 @@ public partial class Canvas
 
         _drawer = new PrimitivesDrawer(this);
         _mouseHandler = new MouseHandler(this);
+        _keyboardHandler = new KeyboardHandler(this);
 
         Clear();
     }
@@ -89,6 +94,7 @@ public partial class Canvas
         );
 
         using MouseHandler.UpdateContext mouseCtx = _mouseHandler.BeginUpdate(renderInfo);
+        using KeyboardHandler.UpdateContext keyboardCtx = _keyboardHandler.BeginUpdate();
 
         TimeSpan prevTime = Time;
         Time = _time.Elapsed;

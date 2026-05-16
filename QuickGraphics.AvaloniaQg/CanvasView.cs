@@ -10,6 +10,8 @@ public class CanvasView(Canvas canvas) : OpenGlControlBase, ICustomHitTest
 {
     private readonly Canvas _canvas = canvas;
 
+    private TopLevel? _originalTopLevel;
+
     public bool HitTest(Avalonia.Point point) => Bounds.Contains(point);
 
     protected override void OnOpenGlInit(GlInterface gl)
@@ -17,6 +19,16 @@ public class CanvasView(Canvas canvas) : OpenGlControlBase, ICustomHitTest
         base.OnOpenGlInit(gl);
 
         _canvas.Load(GL.GetApi(gl.GetProcAddress));
+
+        _originalTopLevel = TopLevel.GetTopLevel(this);
+        if (_originalTopLevel == null)
+        {
+            // Something went completely wrong.
+            return;
+        }
+
+        _originalTopLevel.KeyDown += OnKeyDown;
+        _originalTopLevel.KeyUp += OnKeyUp;
     }
 
     protected override void OnOpenGlRender(GlInterface gl, int fb)
@@ -24,7 +36,7 @@ public class CanvasView(Canvas canvas) : OpenGlControlBase, ICustomHitTest
         TopLevel? topLevel = TopLevel.GetTopLevel(this);
         if (topLevel == null)
         {
-            // Something goes completely wrong.
+            // Something went completely wrong.
             return;
         }
 
@@ -95,10 +107,36 @@ public class CanvasView(Canvas canvas) : OpenGlControlBase, ICustomHitTest
         });
     }
 
+    private void OnKeyDown(object? sender, KeyEventArgs e)
+    {
+        _canvas.KeyboardHandler.Press(e.PhysicalKey.ToSilkKey());
+
+        if (e.KeySymbol != null)
+        {
+            foreach (char c in e.KeySymbol)
+            {
+                _canvas.KeyboardHandler.AddChar(c);
+            }
+        }
+    }
+
+    private void OnKeyUp(object? sender, KeyEventArgs e)
+    {
+        base.OnKeyUp(e);
+
+        _canvas.KeyboardHandler.Release(e.PhysicalKey.ToSilkKey());
+    }
+
     protected override void OnOpenGlDeinit(GlInterface gl)
     {
         base.OnOpenGlDeinit(gl);
 
         _canvas.Dispose();
+
+        if (_originalTopLevel != null)
+        {
+            _originalTopLevel.KeyDown -= OnKeyDown;
+            _originalTopLevel.KeyUp -= OnKeyUp;
+        }
     }
 }
