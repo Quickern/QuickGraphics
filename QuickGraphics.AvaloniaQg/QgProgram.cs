@@ -1,14 +1,14 @@
 namespace QuickGraphics.AvaloniaQg;
 
-public class QgProgram(Action program, QgProgram.PrintHandler? printHandler)
+public class QgProgram(Action program)
 {
-    public delegate void PrintHandler(string message);
-
     private readonly Action _program = program;
-    private readonly PrintHandler? _printHandler = printHandler;
 
     private readonly TaskCompletionSource<Canvas> _canvasTcs = new TaskCompletionSource<Canvas>();
     private TaskCompletionSource? _programTcs;
+
+    // TODO: I don't like this internal!
+    internal QgConsole.IProvider Provider { get => QgConsole.Provider; set => QgConsole.Provider = value; }
 
     public Task RunAsync()
     {
@@ -29,11 +29,6 @@ public class QgProgram(Action program, QgProgram.PrintHandler? printHandler)
     private void MainThreadLoop(object? state)
     {
         Thread.CurrentThread.Name = "Program Main Thread";
-
-        if (_printHandler != null)
-        {
-            QgConsole.LogResolver = Print;
-        }
 
         QgCanvas.CanvasResolver = CreateCanvas;
 
@@ -63,11 +58,5 @@ public class QgProgram(Action program, QgProgram.PrintHandler? printHandler)
 
         _canvasTcs.SetResult(canvas);
         return canvas;
-    }
-
-    private void Print(QgConsole.LogType type, string message)
-    {
-        _printHandler?.Invoke(message);
-        Console.WriteLine($"[Canvas] {message}");
     }
 }
