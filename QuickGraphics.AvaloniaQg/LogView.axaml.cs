@@ -52,6 +52,7 @@ public partial class LogView : UserControl, QgConsole.IProvider
 
             ConsoleInputGrid.IsVisible = true;
             ConsoleInput.Text = string.Empty;
+            ConsoleInput.Focus();
 
             _textEnterTcs = new TaskCompletionSource<string>();
 
