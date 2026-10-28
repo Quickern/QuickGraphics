@@ -15,16 +15,12 @@ public readonly struct Number2
       IUtf8SpanFormattable
 {
     private readonly int _dividend;
-    private readonly int _divisor;
+    private readonly uint _divisor;
 
     public static readonly Number2 MinValue = new Number2(int.MaxValue, 0);
     public static readonly Number2 MaxValue = new Number2(int.MinValue, 0);
 
-    public static readonly Number2 NaN = new Number2(0, -1);
-    public static readonly Number2 NegativeInfinity = new Number2(1, -1);
-    public static readonly Number2 PositiveInfinity = new Number2(-1, -1);
-
-    private Number2(int dividend, int divisor)
+    private Number2(int dividend, uint divisor)
     {
         _dividend = dividend;
         _divisor = divisor;
@@ -39,28 +35,7 @@ public readonly struct Number2
             return (value is null) ? 1 : throw new ArgumentException("Must be a number!");
         }
 
-        if (this < value)
-        {
-            return -1;
-        }
-
-        if (this > value)
-        {
-            return 1;
-        }
-
-        if (this == value)
-        {
-            return 0;
-        }
-
-        if (IsNaN(this))
-        {
-            return IsNaN(value) ? 0 : -1;
-        }
-
-        Debug.Assert(IsNaN(value));
-        return 1;
+        return this < number ? -1 : this > number ? 1 : 0;
     }
 
     #endregion
@@ -153,45 +128,13 @@ public readonly struct Number2
 
     #region IComparable<>
 
-    public int CompareTo(Number2 value)
-    {
-        if (this < value)
-        {
-            return -1;
-        }
-
-        if (this > value)
-        {
-            return 1;
-        }
-
-        if (this == value)
-        {
-            return 0;
-        }
-
-        if (IsNaN(this))
-        {
-            return IsNaN(value) ? 0 : -1;
-        }
-
-        Debug.Assert(IsNaN(value));
-        return 1;
-    }
+    public int CompareTo(Number2 value) => this < value ? -1 : this > value ? 1 : 0;
 
     #endregion
 
     #region IEquatable<>
 
-    public bool Equals(Number2 obj)
-    {
-        if (obj == this)
-        {
-            return true;
-        }
-
-        return IsNaN(obj) && IsNaN(this);
-    }
+    public bool Equals(Number2 obj) => obj == this;
 
     #endregion
 
@@ -240,13 +183,6 @@ public interface IRationalNumber<TSelf>
           ITrigonometricFunctions<TSelf>
         where TSelf : IRationalNumber<TSelf>?
 {
-    /// <summary>Gets a value that represents <c>NaN</c>.</summary>
-    static abstract TSelf NaN { get; }
-    /// <summary>Gets a value that represents negative <c>infinity</c>.</summary>
-    static abstract TSelf NegativeInfinity { get; }
-    /// <summary>Gets a value that represents positive <c>infinity</c>.</summary>
-    static abstract TSelf PositiveInfinity { get; }
-
     /// <summary>Computes the ceiling of a value.</summary>
     /// <param name="x">The value whose ceiling is to be computed.</param>
     /// <returns>The ceiling of <paramref name="x" />.</returns>
@@ -277,10 +213,10 @@ public interface IRationalNumber<TSelf>
     /// <returns>The floor of <paramref name="x" />.</returns>
     static virtual TSelf Floor(TSelf x) => TSelf.Round(x, MidpointRounding.ToNegativeInfinity);
 
-    /// <summary>Rounds a value to the nearest integer using the default rounding mode (<see cref="MidpointRounding.ToEven" />).</summary>
+    /// <summary>Rounds a value to the nearest integer using the default rounding mode (<see cref="MidpointRounding.AwayFromZero" />).</summary>
     /// <param name="x">The value to round.</param>
     /// <returns>The result of rounding <paramref name="x" /> to the nearest integer using the default rounding mode.</returns>
-    static virtual TSelf Round(TSelf x) => TSelf.Round(x, MidpointRounding.ToEven);
+    static virtual TSelf Round(TSelf x) => TSelf.Round(x, MidpointRounding.AwayFromZero);
 
     /// <summary>Rounds a value to the nearest integer using the specified rounding mode.</summary>
     /// <param name="x">The value to round.</param>
